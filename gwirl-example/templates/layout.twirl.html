@@ -1,0 +1,16 @@
+@(content string)
+
+@if content == "" {
+    <html></html>
+}
+<html>
+    <head>
+        @{}
+        <title>@content!</title>
+    </head>
+    <body>
+        <nav class="nav"></nav>
+        <main>@content</main>
+        <footer></footer>
+    </body>
+</html>

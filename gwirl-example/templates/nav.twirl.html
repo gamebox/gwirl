@@ -1,0 +1,14 @@
+@(path string)
+@{
+    routes := []struct {
+        label string
+        path string
+    }{}
+}
+<nav class="navbar">
+    <ul>
+        @for _, route := range routes {
+        <li @if route.path == path { class="selected" }>@route.label</li>
+        }
+    </ul>
+</nav>
