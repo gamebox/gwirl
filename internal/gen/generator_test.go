@@ -1,12 +1,18 @@
 package gen
 
 import (
-	"fmt"
+	_ "embed"
 	"strings"
 	"testing"
 
 	"github.com/gamebox/gwirl/internal/parser"
+	"github.com/hexops/gotextdiff"
+	"github.com/hexops/gotextdiff/myers"
+	"github.com/hexops/gotextdiff/span"
 )
+
+//go:embed testdata/simple_gwirl.go
+var simple string
 
 func TestGenerator(t *testing.T) {
     template := parser.NewTemplate2(
@@ -20,7 +26,7 @@ func TestGenerator(t *testing.T) {
                 parser.NewTT2Plain("\n\t\t<hr />\n\t"),
             }, nil, nil),
             parser.NewTT2Plain("\n\t<h2>"),
-            parser.NewTT2GoExp("name", nil),
+            parser.NewTT2GoExp("name", true, nil),
             parser.NewTT2Plain("</h2>\n"),
         },
         
@@ -29,5 +35,9 @@ func TestGenerator(t *testing.T) {
     gen := NewGenerator(false)
     writer := strings.Builder{}
     gen.Generate(template, "views", &writer)
-    fmt.Println(writer.String())
+    if writer.String() != simple {
+        edits := myers.ComputeEdits(span.URI("testdata/simple_gwirl.go"), simple, writer.String())
+        diff := gotextdiff.ToUnified("expected", "received", simple, edits)
+        t.Fatalf("Generated template did not match golden:\n%s", diff)
+    }
 }

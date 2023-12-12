@@ -3,9 +3,9 @@
 @{
     var foo string
     if index % 2 == 0 {
-        foo := "even"
+        foo = "even"
     } else {
-        foo := "odd"
+        foo = "odd"
     }
 }
 

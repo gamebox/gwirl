@@ -15,6 +15,12 @@ const (
     ISTabs
 )
 
+var (
+    tabIndent []byte = []byte("\t")
+    spaceIndent []byte = []byte("    ")
+    newline []byte = []byte("\n")
+)
+
 type Generator struct {
     indentLevel int
     indentStyle IndentStyle
@@ -134,7 +140,11 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
             G.writeNoIndent(" = sb_.String()\n")
             G.dedent()
             G.write("}\n")
-            G.write("sb_.WriteString(")
+            if (tree.Metadata | parser.TTMDEscape) != 0 {
+                G.write("gwirl.WriteEscapedHTML(&sb_, ")
+            } else {
+                G.write("sb_.WriteString(")
+            }
             if strings.HasSuffix(tree.Text, "()") {
                 text, _ := strings.CutSuffix(tree.Text, ")")
                 text = text+varName+")"
@@ -148,7 +158,11 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
             }
             G.writeNoIndent(")\n")
         } else {
-            G.write("sb_.WriteString(")
+            if (tree.Metadata | parser.TTMDEscape) != 0 {
+                G.write("gwirl.WriteEscapedHTML(&sb_, ")
+            } else {
+                G.write("sb_.WriteString(")
+            }
             G.writeNoIndent(tree.Text)
             G.writeNoIndent(")")
         }
@@ -161,13 +175,18 @@ func (G *Generator) write(str string) {
     indent := 0
     for indent < G.indentLevel {
         if G.indentStyle == ISTabs {
-            G.writer.Write([]byte("\t"))
+            G.writer.Write(tabIndent)
         } else {
-            G.writer.Write([]byte("    "))
+            G.writer.Write(spaceIndent)
         }
         indent += 1
     }
     G.writer.Write([]byte(str))
+}
+
+func (G *Generator) writeln(str string) {
+    G.write(str)
+    G.writer.Write(newline)
 }
 
 func (G *Generator) writeNoIndent(str string) {
@@ -197,7 +216,14 @@ func (G *Generator) Generate(template parser.Template2, pkg string, writer io.Wr
         G.write(i)
         G.write("\n")
     }
-    G.write("import \"strings\"")
+    G.writeln("import (")
+    G.indent()
+    G.write("\"strings\"")
+    G.newlines()
+    G.writeln("\"github.com/gamebox/gwirl\"")
+    G.dedent()
+    G.writeln(")")
+
 
     G.newlines()
 
@@ -220,7 +246,7 @@ func (G *Generator) Generate(template parser.Template2, pkg string, writer io.Wr
     G.dedent()
 
     // Write Template boilerplate end
-    G.write("}")
+    G.writeln("}")
 
     return nil
 }

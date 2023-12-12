@@ -22,8 +22,7 @@ type templateEntry struct {
 func TemplateNames(fileContents map[string]string) []templateEntry {
     entries := make([]templateEntry, 0, 100)
     for filepath := range fileContents {
-        name :=  strings.TrimSuffix(path.Base(filepath), ".gwirl.html")
-        name = strings.TrimSuffix(name, ".twirl.html")
+        name :=  strings.TrimSuffix(path.Base(filepath), ".html.gwirl")
         name = strings.Replace(name, string(name[0]), string(name[0] - 32), 1)
         entries = append(entries, templateEntry{
             path: filepath,

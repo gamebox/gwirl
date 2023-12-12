@@ -7,6 +7,78 @@ import (
 
 type TemplateTree2Type = int
 
+
+type Position interface {
+    Column() int
+    Line() int
+}
+
+type Positional interface {
+    SetPos(pos Position)
+}
+
+// posString -----------------------------------------------------------------
+
+type posString struct {
+    Str string
+    pos Position
+}
+
+func NewPosString(str string) posString {
+    return posString{
+        Str: str,
+        pos: nil,
+    }
+}
+
+func (ps *posString) SetPos(pos Position) {
+    ps.pos = pos
+}
+
+func (ps posString) String() string {
+    if ps.pos != nil {
+        return fmt.Sprintf("posString{ str: \"%s\", pos: [%d,%d] }", ps.Str, ps.pos.Line(), ps.pos.Column())
+    }
+    return fmt.Sprintf("posString{ str: \"%s\" }", ps.Str)
+}
+
+func (ps *posString) Line() int {
+    return ps.pos.Line()
+}
+
+func (ps *posString) Column() int {
+    return ps.pos.Column()
+}
+
+
+// Constructor ---------------------------------------------------------------
+
+type Constructor struct {
+    Comment *TemplateTree2
+    Params posString
+}
+
+func NewConstructor(comment *TemplateTree2, params posString) Constructor {
+    ctr :=  Constructor{
+        Comment: comment,
+        Params: params,
+    }
+
+    return ctr
+}
+
+func (c Constructor) String() string {
+    sb := strings.Builder{}
+    sb.WriteString("Constructor {\n")
+    if c.Comment != nil {
+        sb.WriteString(fmt.Sprintf("\tComment = %v\n", c.Comment))
+    }
+    sb.WriteString(fmt.Sprintf("\tParams = %v\n", c.Params))
+    sb.WriteString("}\n")
+    return sb.String()
+}
+
+// Template Tree -------------------------------------------------------------
 const (
     TT2GoBlock TemplateTree2Type = iota
     TT2Plain
@@ -19,9 +91,14 @@ const (
     TT2LineComment
 )
 
+const (
+    TTMDEscape int = 1
+)
+
 type TemplateTree2 struct {
     Type TemplateTree2Type
     Text string
+    Metadata int
     Children [][]TemplateTree2
     line int
     column int
@@ -81,17 +158,23 @@ func NewTT2For(initialization string, blk []TemplateTree2) TemplateTree2 {
     }
 }
 
-func NewTT2GoExp(content string, transclusions []TemplateTree2) TemplateTree2 {
+func NewTT2GoExp(content string, escape bool, transclusions []TemplateTree2) TemplateTree2 {
     children := [][]TemplateTree2{}
     if len(transclusions) > 0 {
         children = append(children, transclusions)
     }
+    var metadata int
+    if escape {
+        metadata = TTMDEscape
+    }
     return TemplateTree2{
         Type: TT2GoExp,
         Text: content,
+        Metadata: metadata,
         Children: children,
     }
 }
+
 func NewTT2BlockComment(content string) TemplateTree2 {
     return TemplateTree2{
         Type: TT2BlockComment,

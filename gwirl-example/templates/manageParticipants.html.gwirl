@@ -21,9 +21,9 @@
         }
         @for _, participant := range participants {
             <tr>
-                <td>@participant.FirstName</td>
-                <td>@participant.LastName</td>
-                <td>@participant.Email</td>
+                <td>@!participant.FirstName</td>
+                <td>@!participant.LastName</td>
+                <td>@!participant.Email</td>
                 <td>
                     <a href="#" class="action">Delete</a>
                     <a href="/client/participant/@participant.Id" class="action">Edit</a>

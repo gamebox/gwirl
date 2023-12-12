@@ -12,7 +12,7 @@ import (
 func TestParseTestAll2(t *testing.T) {
     root := "./testdata/"
     filesystem := os.DirFS(root)
-    template, err := fs.ReadFile(filesystem, "testAll.twirl.html")
+    template, err := fs.ReadFile(filesystem, "testAll.html.gwirl")
     if err != nil {
         t.FailNow()
     }

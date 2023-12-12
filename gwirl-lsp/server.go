@@ -285,7 +285,7 @@ func (s *GwirlLspServer) RetrieveWorkspaceTemplates(root string) {
             }
             continue
         }
-        if strings.HasSuffix(entry.Name(), "gwirl.html") || strings.HasSuffix(entry.Name(), "twirl.html") {
+        if strings.HasSuffix(entry.Name(), ".gwirl") {
             s.logf("Loading %s", entries[idx])
             contents, err := os.ReadFile(entries[idx])
             if err != nil {

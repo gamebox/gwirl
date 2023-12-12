@@ -8,7 +8,7 @@ import (
 )
 
 /*
- * The GoTwirl Parser2 implements this  grammar that removes some back-tracking within the
+ * The Gwirl Parser2 implements this  grammar that removes some back-tracking within the
  * 'mixed' non-terminal. It is defined as follows:
  * {{{
  *   parser : comment? whitespace? ('@' parentheses)? templateContent
@@ -348,7 +348,9 @@ func (p *Parser2) expression() *TemplateTree2 {
     p.log("expression")
     if !p.checkStr("@") {
         return nil
-    } 
+    }
+
+    escape := p.checkStr("!")
 
     pos := p.input.offset()
     call := p.methodCall()
@@ -364,18 +366,18 @@ func (p *Parser2) expression() *TemplateTree2 {
     }
 
     if !strings.HasSuffix(combinedExpression, ")") {
-        t :=  NewTT2GoExp(combinedExpression, []TemplateTree2{})
+        t :=  NewTT2GoExp(combinedExpression, escape, []TemplateTree2{})
         p.position(&t, pos)
         return &t
     }
 
     blk := p.block()
     if blk != nil {
-        t := NewTT2GoExp(combinedExpression, *blk)
+        t := NewTT2GoExp(combinedExpression, escape, *blk)
         p.position(&t, pos)
         return &t
     } else {
-        t := NewTT2GoExp(combinedExpression, []TemplateTree2{})
+        t := NewTT2GoExp(combinedExpression, escape, []TemplateTree2{})
         p.position(&t, pos)
         return &t
     }

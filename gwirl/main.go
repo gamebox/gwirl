@@ -30,16 +30,21 @@ func getTemplateFiles(templateDir string, filters []string) []File {
         if dir.IsDir() {
             subEntries := getTemplateFiles(filepath.Join(templateDir, dir.Name()), filters)
             files = append(files, subEntries...) 
-        } else if strings.HasSuffix(dir.Name(), ".twirl.html") && matchesFilter(dir.Name(), filters) {
+        } else if strings.HasSuffix(dir.Name(), ".gwirl") && matchesFilter(dir.Name(), filters) {
             fileContent, err := os.ReadFile(filepath.Join(templateDir, dir.Name()))
             if err != nil {
                 continue
+            }
+            filenameSegments := strings.Split(filepath.Base(dir.Name()), ".")
+            fileType := filenameSegments[len(filenameSegments) - 2]
+            if fileType != "html" && fileType != "xml" && fileType != "md" && fileType != "txt" {
+                fileType = "txt"
             }
             files = append(files, File{
                 name: strings.Split(dir.Name(), ".")[0],
                 content: string(fileContent),
                 generated: nil,
-                filetype: "html",
+                filetype: fileType,
             })
         }
     }
@@ -128,20 +133,20 @@ func main() {
         p.SetLogger(parserLogger)
     }
 
-    ensureDirectoryExists(filepath.Join("views", "html"))
     for _, f := range fs {
+        ensureDirectoryExists(filepath.Join("views", f.filetype))
         log.Printf("Parsing %s\n", f.name)
 
         result := p.Parse(f.content, capitalize(f.name))
         if len(result.Errors) > 0 {
-            log.Printf("Could not parse file %s:\n", f.name+".twirl."+f.filetype)
+            log.Printf("Could not parse file %s:\n", f.name+f.filetype+".gwirl")
             for _, e := range result.Errors {
                 log.Printf("%v\n", e)
             }
             log.Fatalln("FAILED")
         }
 
-        fileWriter, err := os.Create(filepath.Join("views", f.filetype, f.name + "_twirl.go"))
+        fileWriter, err := os.Create(filepath.Join("views", f.filetype, f.name + "_gwirl.go"))
         if err != nil {
             log.Fatalf("Failed to open go file for template: %s\nERROR: %v", f.name, err)
         }

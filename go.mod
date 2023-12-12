@@ -3,6 +3,7 @@ module github.com/gamebox/gwirl
 go 1.20
 
 require (
+	github.com/hexops/gotextdiff v1.0.3
 	go.lsp.dev/jsonrpc2 v0.10.0
 	go.lsp.dev/protocol v0.12.0
 )
