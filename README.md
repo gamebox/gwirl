@@ -56,13 +56,13 @@ the rendered content.
 ```gwirl
 <h1>@name</h1>
 <h2>@pkg.SomeFunction(var1)</h2>
-@GwirlRaw(userContent)
+@!userContent
 ```
 
 Use an arbitrary Go expression (simple expressions only) and that content will
-be escaped appropriately and rendered as a string directly into the content
-using the `Stringer` interface. Use the `@GwirlRaw` function to render content
-as-is with no escaping.
+be rendered as a string directly into the content using the `Stringer`
+interface. Use the `@!` syntax to render content with escaping that is
+appropriate to the content's filetype.
 
 ### Imports
 
