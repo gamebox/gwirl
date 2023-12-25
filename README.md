@@ -1,6 +1,6 @@
 # Gwirl
 
-![ci status](https://github.com/gamebox/gwirl/actions/workflows/master.yml/badge.svg)
+![ci status](https://github.com/gamebox/gwirl/actions/workflows/master.yml/badge.svg)  [![Go Reference](https://pkg.go.dev/badge/github.com/gamebox/gwirl.svg)](https://pkg.go.dev/github.com/gamebox/gwirl)
 
 A typesafe templating language for Go projects, inspired by Scala Play's Twirl
 template engine.
