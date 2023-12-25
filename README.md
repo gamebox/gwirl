@@ -1,5 +1,7 @@
 # Gwirl
 
+![ci status](https://github.com/gamebox/gwirl/actions/workflows/master.yml/badge.svg)
+
 A typesafe templating language for Go projects, inspired by Scala Play's Twirl
 template engine.
 
