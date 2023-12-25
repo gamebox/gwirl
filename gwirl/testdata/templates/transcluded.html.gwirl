@@ -1,0 +1,23 @@
+@(name string, index int)
+
+@{
+    var foo string
+    if index % 2 == 0 {
+        foo = "even"
+    } else {
+        foo = "odd"
+    }
+}
+
+@Layout() {
+    <div>
+        @if index > 0 {
+            <hr />
+        }
+        <h2>@name</h2>
+        <h3>@foo</h3>
+        <script>
+            document.body.addEventListener("load", () => {})
+        </script>
+    </div>
+}

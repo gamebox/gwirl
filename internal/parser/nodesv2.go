@@ -197,7 +197,7 @@ func (tt TemplateTree2) String() string {
     case TT2Plain:
         sb.WriteString(fmt.Sprintf("Plain(\"%s\")", tt.Text))
     case TT2GoExp:
-        sb.WriteString(fmt.Sprintf("GoExp(\"%s\", { %v })", tt.Text, tt.Children))
+        sb.WriteString(fmt.Sprintf("GoExp(\"%s\", { metadata: %b, %v })", tt.Text, tt.Metadata, tt.Children))
     case TT2If:
         sb.WriteString(fmt.Sprintf("GoIf(\"%s\", %v)", tt.Text, tt.Children))
     case TT2ElseIf:

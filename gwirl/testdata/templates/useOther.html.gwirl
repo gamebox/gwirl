@@ -1,0 +1,7 @@
+@(names []string)
+
+<div>
+@for i, name := range names {
+    @TestAll(name, i)
+}
+</div>

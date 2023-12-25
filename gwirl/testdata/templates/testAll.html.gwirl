@@ -3,9 +3,9 @@
 *****************@
 @(name string, index int)
 
-<div>
+<div @if index == 0 { class="first" }>
     @if index > 0 {
         <hr />
     }
-    <h2>@!name</h2>
+    <h2>@name</h2>
 </div>
