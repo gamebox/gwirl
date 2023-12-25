@@ -1,7 +1,7 @@
-- name: CI
-  on: [push]
-  branch: master
-  steps:
+name: CI
+on: [push]
+branch: master
+steps:
   - name: Setup Go environment
     uses: actions/setup-go@v5.0.0
     with:
