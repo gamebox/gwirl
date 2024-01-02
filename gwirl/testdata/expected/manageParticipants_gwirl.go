@@ -2,28 +2,26 @@ package html
 
 import "github.com/gamebox/gwirl/gwirl-example/model"
 import (
-    "strings"
-
     "github.com/gamebox/gwirl"
 )
 
 
 func ManageParticipants(participants []model.Participant) string {
-    sb_ := strings.Builder{}
+    sb_ := gwirl.TemplateBuilder{}
 
     sb_.WriteString(`
-<div class="title-container">
-    <h1>Participant Manager</h1>
-    <a class="action" target="_blank" href="/cpc/">New</a>
+<div class="md:flex md:items-center md:justify-between">
+    <h1 class="text-2xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight">Participant Manager</h1>
+    <a class="ml-3 inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-500 hover:bg-green-500" target="_blank" href="/cpc/">New</a>
 </div>
 
-<table class="list" cellspacing="0" cellpadding="0">
+<table class="w-full" cellspacing="0" cellpadding="0">
     <thead>
         <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Actions</th>
+            <th class="bg-gray-500">First Name</th>
+            <th class="bg-gray-500">Last Name</th>
+            <th class="bg-gray-500">Email</th>
+            <th class="bg-gray-500">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -63,7 +61,7 @@ func ManageParticipants(participants []model.Participant) string {
                     <a href="#" class="action">Delete</a>
                     <a href="/client/participant/`)
 
-        gwirl.WriteEscapedHTML(&sb_, participant.Id)
+        sb_.WriteString(participant.Id)
 
         sb_.WriteString(`" class="action">Edit</a>
                 </td>

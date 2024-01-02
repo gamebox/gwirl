@@ -1,0 +1,5 @@
+@(msg string)
+
+<section>
+    <strong>@!msg</strong>
+</section>

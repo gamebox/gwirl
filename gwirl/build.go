@@ -6,50 +6,50 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
-    "unicode"
+	"unicode"
 
 	"github.com/gamebox/gwirl/internal/gen"
 	"github.com/gamebox/gwirl/internal/parser"
 )
 
 type Builder struct {
-    flags *Flags
-    accessor FSAccessor
-    logger io.Writer
-    parser *parser.Parser2
-    generator *gen.Generator
+	flags     *Flags
+	accessor  FSAccessor
+	logger    io.Writer
+	parser    *parser.Parser2
+	generator *gen.Generator
 }
 
 func NewBuilder(flags *Flags, accessor FSAccessor, logger io.Writer) *Builder {
-    b := Builder{
-        flags: flags,
-        accessor: accessor,
-        logger: logger,
-    }
-    p := parser.NewParser2("")
+	b := Builder{
+		flags:    flags,
+		accessor: accessor,
+		logger:   logger,
+	}
+	p := parser.NewParser2("")
 	if logger != nil {
 		p.SetLogger(logger)
 	}
-    g := gen.NewGenerator(false)
-    b.parser = &p
-    b.generator = &g
+	g := gen.NewGenerator(false)
+	b.parser = &p
+	b.generator = &g
 
-    return &b
+	return &b
 }
 
 func capitalize(str string) string {
-    runes := []rune(str)
-    if len(runes) == 0 {
-        return ""
-    }
-    runes[0] = unicode.ToUpper(runes[0])
-    return string(runes)
+	runes := []rune(str)
+	if len(runes) == 0 {
+		return ""
+	}
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
 
 func (b *Builder) Printf(format string, vals ...any) {
-    if b.logger != nil {
-        b.logger.Write([]byte(fmt.Sprintf(format, vals...)))
-    }
+	if b.logger != nil {
+		b.logger.Write([]byte(fmt.Sprintf(format, vals...)))
+	}
 }
 
 func (b *Builder) parse(f *File) (*parser.ParseResult2, error) {
@@ -103,6 +103,6 @@ func (b *Builder) build() error {
 		}
 	}
 
-    b.Printf("Completed generating %d templates", len(fs))
+	b.Printf("Completed generating %d templates", len(fs))
 	return nil
 }

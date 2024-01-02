@@ -5,12 +5,12 @@
 }
 <html>
     <head>
-        @{}
-        <title>@content!</title>
+        <title>@!content</title>
     </head>
-    <body>
+    <body hx-boost="true">
         <nav class="nav"></nav>
         <main>@content</main>
         <footer></footer>
+        <script src="https://unpkg.com/htmx.org@@1.9.10/dist/htmx.min.js"></script>
     </body>
 </html>

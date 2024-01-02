@@ -1,0 +1,916 @@
+Parsing base
+[PARSER]: Args is 0x1400010a690
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, [import "github.com/gamebox/gwirl/gwirl-example/flash"]
+[PARSER]: mixedOpt1: trying comment @ 119
+[PARSER]: mixedOpt1: trying block @ 119
+[PARSER]: mixedOpt1: trying for @ 119
+[PARSER]: mixedOpt1: trying if @ 119
+[PARSER]: mixedOpt1: trying plain @ 119
+[PARSER]: mixedOpt1: got plain: Plain("
+<html lang="en" class="min-h-full">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content="Astro description" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <title>")@[4,0]
+[PARSER]: mixedOpt1: trying comment @ 407
+[PARSER]: mixedOpt1: trying block @ 407
+[PARSER]: mixedOpt1: trying for @ 407
+[PARSER]: mixedOpt1: trying if @ 407
+[PARSER]: mixedOpt1: trying plain @ 407
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "title"
+[PARSER]: full methodCall name: "title"
+
+[PARSER]: expression was not null: GoExp("title", { metadata: 0, [] })@[11,16]
+
+[PARSER]: mixedOpt1: trying comment @ 413
+[PARSER]: mixedOpt1: trying block @ 413
+[PARSER]: mixedOpt1: trying for @ 413
+[PARSER]: mixedOpt1: trying if @ 413
+[PARSER]: mixedOpt1: trying plain @ 413
+[PARSER]: mixedOpt1: got plain: Plain("</title>
+        <link rel="stylesheet" href="/assets/timebox.css">
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+        <style>
+        html {
+            --accent: 22, 163, 74;
+            --tb-logo-stroke-color: rgb(var(--accent));
+        ")@[11,21]
+[PARSER]: mixedOpt1: trying comment @ 682
+[PARSER]: mixedOpt1: trying block @ 682
+[PARSER]: mixedOpt1: trying for @ 682
+[PARSER]: mixedOpt1: trying if @ 682
+[PARSER]: mixedOpt1: trying plain @ 682
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating base
+Parsing layout
+[PARSER]: Args is 0x1400010a840
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, []
+[PARSER]: mixedOpt1: trying comment @ 19
+[PARSER]: mixedOpt1: trying block @ 19
+[PARSER]: mixedOpt1: trying for @ 19
+[PARSER]: mixedOpt1: trying if @ 19
+[PARSER]: mixedOpt1: trying comment @ 38
+[PARSER]: mixedOpt1: trying block @ 38
+[PARSER]: mixedOpt1: trying for @ 38
+[PARSER]: mixedOpt1: trying if @ 38
+[PARSER]: mixedOpt1: trying plain @ 38
+[PARSER]: mixedOpt1: got plain: Plain("
+    <html></html>
+")@[3,19]
+[PARSER]: mixedOpt1: trying comment @ 57
+[PARSER]: mixedOpt1: trying block @ 57
+[PARSER]: mixedOpt1: trying for @ 57
+[PARSER]: mixedOpt1: trying if @ 57
+[PARSER]: mixedOpt1: trying plain @ 57
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain("
+    <html></html>
+")@[3,19]]
+[PARSER]: mixedOpt1: trying comment @ 58
+[PARSER]: mixedOpt1: trying block @ 58
+[PARSER]: mixedOpt1: trying for @ 58
+[PARSER]: mixedOpt1: trying if @ 58
+[PARSER]: mixedOpt1: trying plain @ 58
+[PARSER]: mixedOpt1: got plain: Plain("
+<html>
+    <head>
+        ")@[5,1]
+[PARSER]: mixedOpt1: trying comment @ 85
+[PARSER]: mixedOpt1: trying block @ 85
+[PARSER]: mixedOpt1: trying comment @ 88
+[PARSER]: mixedOpt1: trying block @ 88
+[PARSER]: mixedOpt1: trying for @ 88
+[PARSER]: mixedOpt1: trying if @ 88
+[PARSER]: mixedOpt1: trying plain @ 88
+[PARSER]: mixedOpt1: got plain: Plain("
+        <title>")@[8,11]
+[PARSER]: mixedOpt1: trying comment @ 104
+[PARSER]: mixedOpt1: trying block @ 104
+[PARSER]: mixedOpt1: trying for @ 104
+[PARSER]: mixedOpt1: trying if @ 104
+[PARSER]: mixedOpt1: trying plain @ 104
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "content"
+[PARSER]: full methodCall name: "content"
+
+[PARSER]: expression was not null: GoExp("content", { metadata: 0, [] })@[9,16]
+
+[PARSER]: mixedOpt1: trying comment @ 112
+[PARSER]: mixedOpt1: trying block @ 112
+[PARSER]: mixedOpt1: trying for @ 112
+[PARSER]: mixedOpt1: trying if @ 112
+[PARSER]: mixedOpt1: trying plain @ 112
+[PARSER]: mixedOpt1: got plain: Plain("!</title>
+    </head>
+    <body>
+        <nav class="nav"></nav>
+        <main>")@[9,23]
+[PARSER]: mixedOpt1: trying comment @ 191
+[PARSER]: mixedOpt1: trying block @ 191
+[PARSER]: mixedOpt1: trying for @ 191
+[PARSER]: mixedOpt1: trying if @ 191
+[PARSER]: mixedOpt1: trying plain @ 191
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "content"
+[PARSER]: full methodCall name: "content"
+
+[PARSER]: expression was not null: GoExp("content", { metadata: 1, [] })@[13,16]
+
+[PARSER]: mixedOpt1: trying comment @ 200
+[PARSER]: mixedOpt1: trying block @ 200
+[PARSER]: mixedOpt1: trying for @ 200
+[PARSER]: mixedOpt1: trying if @ 200
+[PARSER]: mixedOpt1: trying plain @ 200
+[PARSER]: mixedOpt1: got plain: Plain("</main>
+        <footer></footer>
+    </body>
+</html>
+")@[13,23]
+[PARSER]: mixedOpt1: trying comment @ 254
+[PARSER]: mixedOpt1: trying block @ 254
+[PARSER]: mixedOpt1: trying for @ 254
+[PARSER]: mixedOpt1: trying if @ 254
+[PARSER]: mixedOpt1: trying plain @ 254
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating layout
+Parsing manageParticipants
+[PARSER]: Args is 0x1400010aba0
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, [import "github.com/gamebox/gwirl/gwirl-example/model"]
+[PARSER]: mixedOpt1: trying comment @ 92
+[PARSER]: mixedOpt1: trying block @ 92
+[PARSER]: mixedOpt1: trying for @ 92
+[PARSER]: mixedOpt1: trying if @ 92
+[PARSER]: mixedOpt1: trying plain @ 92
+[PARSER]: mixedOpt1: got plain: Plain("
+<div class="title-container">
+    <h1>Participant Manager</h1>
+    <a class="action" target="_blank" href="/cpc/">New</a>
+</div>
+
+<table class="list" cellspacing="0" cellpadding="0">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        ")@[4,0]
+[PARSER]: mixedOpt1: trying comment @ 467
+[PARSER]: mixedOpt1: trying block @ 467
+[PARSER]: mixedOpt1: trying for @ 467
+[PARSER]: mixedOpt1: trying if @ 467
+[PARSER]: mixedOpt1: trying comment @ 495
+[PARSER]: mixedOpt1: trying block @ 495
+[PARSER]: mixedOpt1: trying for @ 495
+[PARSER]: mixedOpt1: trying if @ 495
+[PARSER]: mixedOpt1: trying plain @ 495
+[PARSER]: mixedOpt1: got plain: Plain("
+            <tr>
+                <td colspan="4">No participants</td>
+            </tr>
+        ")@[20,36]
+[PARSER]: mixedOpt1: trying comment @ 592
+[PARSER]: mixedOpt1: trying block @ 592
+[PARSER]: mixedOpt1: trying for @ 592
+[PARSER]: mixedOpt1: trying if @ 592
+[PARSER]: mixedOpt1: trying plain @ 592
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain("
+            <tr>
+                <td colspan="4">No participants</td>
+            </tr>
+        ")@[20,36]]
+[PARSER]: mixedOpt1: trying comment @ 593
+[PARSER]: mixedOpt1: trying block @ 593
+[PARSER]: mixedOpt1: trying for @ 593
+[PARSER]: mixedOpt1: trying if @ 593
+[PARSER]: mixedOpt1: trying plain @ 593
+[PARSER]: mixedOpt1: got plain: Plain("
+        ")@[24,9]
+[PARSER]: mixedOpt1: trying comment @ 602
+[PARSER]: mixedOpt1: trying block @ 602
+[PARSER]: mixedOpt1: trying for @ 602
+[PARSER]: mixedOpt1: trying comment @ 645
+[PARSER]: mixedOpt1: trying block @ 645
+[PARSER]: mixedOpt1: trying for @ 645
+[PARSER]: mixedOpt1: trying if @ 645
+[PARSER]: mixedOpt1: trying plain @ 645
+[PARSER]: mixedOpt1: got plain: Plain("
+            <tr>
+                <td>")@[25,51]
+[PARSER]: mixedOpt1: trying comment @ 683
+[PARSER]: mixedOpt1: trying block @ 683
+[PARSER]: mixedOpt1: trying for @ 683
+[PARSER]: mixedOpt1: trying if @ 683
+[PARSER]: mixedOpt1: trying plain @ 683
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "participant"
+[PARSER]: full methodCall name: "participant"
+
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "FirstName"
+[PARSER]: full methodCall name: "FirstName"
+
+[PARSER]: expression was not null: GoExp("participant.FirstName", { metadata: 1, [] })@[27,22]
+
+[PARSER]: mixedOpt1: trying comment @ 706
+[PARSER]: mixedOpt1: trying block @ 706
+[PARSER]: mixedOpt1: trying for @ 706
+[PARSER]: mixedOpt1: trying if @ 706
+[PARSER]: mixedOpt1: trying plain @ 706
+[PARSER]: mixedOpt1: got plain: Plain("</td>
+                <td>")@[27,43]
+[PARSER]: mixedOpt1: trying comment @ 732
+[PARSER]: mixedOpt1: trying block @ 732
+[PARSER]: mixedOpt1: trying for @ 732
+[PARSER]: mixedOpt1: trying if @ 732
+[PARSER]: mixedOpt1: trying plain @ 732
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "participant"
+[PARSER]: full methodCall name: "participant"
+
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "LastName"
+[PARSER]: full methodCall name: "LastName"
+
+[PARSER]: expression was not null: GoExp("participant.LastName", { metadata: 1, [] })@[28,22]
+
+[PARSER]: mixedOpt1: trying comment @ 754
+[PARSER]: mixedOpt1: trying block @ 754
+[PARSER]: mixedOpt1: trying for @ 754
+[PARSER]: mixedOpt1: trying if @ 754
+[PARSER]: mixedOpt1: trying plain @ 754
+[PARSER]: mixedOpt1: got plain: Plain("</td>
+                <td>")@[28,42]
+[PARSER]: mixedOpt1: trying comment @ 780
+[PARSER]: mixedOpt1: trying block @ 780
+[PARSER]: mixedOpt1: trying for @ 780
+[PARSER]: mixedOpt1: trying if @ 780
+[PARSER]: mixedOpt1: trying plain @ 780
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "participant"
+[PARSER]: full methodCall name: "participant"
+
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "Email"
+[PARSER]: full methodCall name: "Email"
+
+[PARSER]: expression was not null: GoExp("participant.Email", { metadata: 1, [] })@[29,22]
+
+[PARSER]: mixedOpt1: trying comment @ 799
+[PARSER]: mixedOpt1: trying block @ 799
+[PARSER]: mixedOpt1: trying for @ 799
+[PARSER]: mixedOpt1: trying if @ 799
+[PARSER]: mixedOpt1: trying plain @ 799
+[PARSER]: mixedOpt1: got plain: Plain("</td>
+                <td>
+                    <a href="#" class="action">Delete</a>
+                    <a href="/client/participant/")@[29,39]
+[PARSER]: mixedOpt1: trying comment @ 933
+[PARSER]: mixedOpt1: trying block @ 933
+[PARSER]: mixedOpt1: trying for @ 933
+[PARSER]: mixedOpt1: trying if @ 933
+[PARSER]: mixedOpt1: trying plain @ 933
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "participant"
+[PARSER]: full methodCall name: "participant"
+
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "Id"
+[PARSER]: full methodCall name: "Id"
+
+[PARSER]: expression was not null: GoExp("participant.Id", { metadata: 0, [] })@[32,50]
+
+[PARSER]: mixedOpt1: trying comment @ 948
+[PARSER]: mixedOpt1: trying block @ 948
+[PARSER]: mixedOpt1: trying for @ 948
+[PARSER]: mixedOpt1: trying if @ 948
+[PARSER]: mixedOpt1: trying plain @ 948
+[PARSER]: mixedOpt1: got plain: Plain("" class="action">Edit</a>
+                </td>
+            </tr>
+        ")@[32,64]
+[PARSER]: mixedOpt1: trying comment @ 1022
+[PARSER]: mixedOpt1: trying block @ 1022
+[PARSER]: mixedOpt1: trying for @ 1022
+[PARSER]: mixedOpt1: trying if @ 1022
+[PARSER]: mixedOpt1: trying plain @ 1022
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: mixedOpt1: trying comment @ 1023
+[PARSER]: mixedOpt1: trying block @ 1023
+[PARSER]: mixedOpt1: trying for @ 1023
+[PARSER]: mixedOpt1: trying if @ 1023
+[PARSER]: mixedOpt1: trying plain @ 1023
+[PARSER]: mixedOpt1: got plain: Plain("
+    </tbody>
+</table>
+")@[35,9]
+[PARSER]: mixedOpt1: trying comment @ 1046
+[PARSER]: mixedOpt1: trying block @ 1046
+[PARSER]: mixedOpt1: trying for @ 1046
+[PARSER]: mixedOpt1: trying if @ 1046
+[PARSER]: mixedOpt1: trying plain @ 1046
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating manageParticipants
+Parsing nav
+[PARSER]: Args is 0x1400010aef0
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, []
+[PARSER]: mixedOpt1: trying comment @ 15
+[PARSER]: mixedOpt1: trying block @ 15
+[PARSER]: mixedOpt1: trying comment @ 93
+[PARSER]: mixedOpt1: trying block @ 93
+[PARSER]: mixedOpt1: trying for @ 93
+[PARSER]: mixedOpt1: trying if @ 93
+[PARSER]: mixedOpt1: trying plain @ 93
+[PARSER]: mixedOpt1: got plain: Plain("
+<nav class="navbar">
+    <ul>
+        ")@[7,1]
+[PARSER]: mixedOpt1: trying comment @ 132
+[PARSER]: mixedOpt1: trying block @ 132
+[PARSER]: mixedOpt1: trying for @ 132
+[PARSER]: mixedOpt1: trying comment @ 163
+[PARSER]: mixedOpt1: trying block @ 163
+[PARSER]: mixedOpt1: trying for @ 163
+[PARSER]: mixedOpt1: trying if @ 163
+[PARSER]: mixedOpt1: trying plain @ 163
+[PARSER]: mixedOpt1: got plain: Plain("
+        <li ")@[10,39]
+[PARSER]: mixedOpt1: trying comment @ 176
+[PARSER]: mixedOpt1: trying block @ 176
+[PARSER]: mixedOpt1: trying for @ 176
+[PARSER]: mixedOpt1: trying if @ 176
+[PARSER]: mixedOpt1: trying comment @ 200
+[PARSER]: mixedOpt1: trying block @ 200
+[PARSER]: mixedOpt1: trying for @ 200
+[PARSER]: mixedOpt1: trying if @ 200
+[PARSER]: mixedOpt1: trying plain @ 200
+[PARSER]: mixedOpt1: got plain: Plain(" class="selected" ")@[11,36]
+[PARSER]: mixedOpt1: trying comment @ 218
+[PARSER]: mixedOpt1: trying block @ 218
+[PARSER]: mixedOpt1: trying for @ 218
+[PARSER]: mixedOpt1: trying if @ 218
+[PARSER]: mixedOpt1: trying plain @ 218
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain(" class="selected" ")@[11,36]]
+[PARSER]: mixedOpt1: trying comment @ 219
+[PARSER]: mixedOpt1: trying block @ 219
+[PARSER]: mixedOpt1: trying for @ 219
+[PARSER]: mixedOpt1: trying if @ 219
+[PARSER]: mixedOpt1: trying plain @ 219
+[PARSER]: mixedOpt1: got plain: Plain(">")@[11,55]
+[PARSER]: mixedOpt1: trying comment @ 220
+[PARSER]: mixedOpt1: trying block @ 220
+[PARSER]: mixedOpt1: trying for @ 220
+[PARSER]: mixedOpt1: trying if @ 220
+[PARSER]: mixedOpt1: trying plain @ 220
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "route"
+[PARSER]: full methodCall name: "route"
+
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "label"
+[PARSER]: full methodCall name: "label"
+
+[PARSER]: expression was not null: GoExp("route.label", { metadata: 0, [] })@[11,57]
+
+[PARSER]: mixedOpt1: trying comment @ 232
+[PARSER]: mixedOpt1: trying block @ 232
+[PARSER]: mixedOpt1: trying for @ 232
+[PARSER]: mixedOpt1: trying if @ 232
+[PARSER]: mixedOpt1: trying plain @ 232
+[PARSER]: mixedOpt1: got plain: Plain("</li>
+        ")@[11,68]
+[PARSER]: mixedOpt1: trying comment @ 246
+[PARSER]: mixedOpt1: trying block @ 246
+[PARSER]: mixedOpt1: trying for @ 246
+[PARSER]: mixedOpt1: trying if @ 246
+[PARSER]: mixedOpt1: trying plain @ 246
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: mixedOpt1: trying comment @ 247
+[PARSER]: mixedOpt1: trying block @ 247
+[PARSER]: mixedOpt1: trying for @ 247
+[PARSER]: mixedOpt1: trying if @ 247
+[PARSER]: mixedOpt1: trying plain @ 247
+[PARSER]: mixedOpt1: got plain: Plain("
+    </ul>
+</nav>
+")@[12,9]
+[PARSER]: mixedOpt1: trying comment @ 265
+[PARSER]: mixedOpt1: trying block @ 265
+[PARSER]: mixedOpt1: trying for @ 265
+[PARSER]: mixedOpt1: trying if @ 265
+[PARSER]: mixedOpt1: trying plain @ 265
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating nav
+Parsing testAll
+[PARSER]: Args is 0x1400010b1c0
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, []
+[PARSER]: mixedOpt1: trying comment @ 84
+[PARSER]: mixedOpt1: trying block @ 84
+[PARSER]: mixedOpt1: trying for @ 84
+[PARSER]: mixedOpt1: trying if @ 84
+[PARSER]: mixedOpt1: trying plain @ 84
+[PARSER]: mixedOpt1: got plain: Plain("<div ")@[6,0]
+[PARSER]: mixedOpt1: trying comment @ 89
+[PARSER]: mixedOpt1: trying block @ 89
+[PARSER]: mixedOpt1: trying for @ 89
+[PARSER]: mixedOpt1: trying if @ 89
+[PARSER]: mixedOpt1: trying comment @ 105
+[PARSER]: mixedOpt1: trying block @ 105
+[PARSER]: mixedOpt1: trying for @ 105
+[PARSER]: mixedOpt1: trying if @ 105
+[PARSER]: mixedOpt1: trying plain @ 105
+[PARSER]: mixedOpt1: got plain: Plain(" class="first" ")@[6,21]
+[PARSER]: mixedOpt1: trying comment @ 120
+[PARSER]: mixedOpt1: trying block @ 120
+[PARSER]: mixedOpt1: trying for @ 120
+[PARSER]: mixedOpt1: trying if @ 120
+[PARSER]: mixedOpt1: trying plain @ 120
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain(" class="first" ")@[6,21]]
+[PARSER]: mixedOpt1: trying comment @ 121
+[PARSER]: mixedOpt1: trying block @ 121
+[PARSER]: mixedOpt1: trying for @ 121
+[PARSER]: mixedOpt1: trying if @ 121
+[PARSER]: mixedOpt1: trying plain @ 121
+[PARSER]: mixedOpt1: got plain: Plain(">
+    ")@[6,37]
+[PARSER]: mixedOpt1: trying comment @ 127
+[PARSER]: mixedOpt1: trying block @ 127
+[PARSER]: mixedOpt1: trying for @ 127
+[PARSER]: mixedOpt1: trying if @ 127
+[PARSER]: mixedOpt1: trying comment @ 142
+[PARSER]: mixedOpt1: trying block @ 142
+[PARSER]: mixedOpt1: trying for @ 142
+[PARSER]: mixedOpt1: trying if @ 142
+[PARSER]: mixedOpt1: trying plain @ 142
+[PARSER]: mixedOpt1: got plain: Plain("
+        <hr />
+    ")@[7,19]
+[PARSER]: mixedOpt1: trying comment @ 162
+[PARSER]: mixedOpt1: trying block @ 162
+[PARSER]: mixedOpt1: trying for @ 162
+[PARSER]: mixedOpt1: trying if @ 162
+[PARSER]: mixedOpt1: trying plain @ 162
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain("
+        <hr />
+    ")@[7,19]]
+[PARSER]: mixedOpt1: trying comment @ 163
+[PARSER]: mixedOpt1: trying block @ 163
+[PARSER]: mixedOpt1: trying for @ 163
+[PARSER]: mixedOpt1: trying if @ 163
+[PARSER]: mixedOpt1: trying plain @ 163
+[PARSER]: mixedOpt1: got plain: Plain("
+    <h2>")@[9,5]
+[PARSER]: mixedOpt1: trying comment @ 172
+[PARSER]: mixedOpt1: trying block @ 172
+[PARSER]: mixedOpt1: trying for @ 172
+[PARSER]: mixedOpt1: trying if @ 172
+[PARSER]: mixedOpt1: trying plain @ 172
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "name"
+[PARSER]: full methodCall name: "name"
+
+[PARSER]: expression was not null: GoExp("name", { metadata: 0, [] })@[10,9]
+
+[PARSER]: mixedOpt1: trying comment @ 177
+[PARSER]: mixedOpt1: trying block @ 177
+[PARSER]: mixedOpt1: trying for @ 177
+[PARSER]: mixedOpt1: trying if @ 177
+[PARSER]: mixedOpt1: trying plain @ 177
+[PARSER]: mixedOpt1: got plain: Plain("</h2>
+</div>
+")@[10,13]
+[PARSER]: mixedOpt1: trying comment @ 190
+[PARSER]: mixedOpt1: trying block @ 190
+[PARSER]: mixedOpt1: trying for @ 190
+[PARSER]: mixedOpt1: trying if @ 190
+[PARSER]: mixedOpt1: trying plain @ 190
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating testAll
+Parsing transcluded
+[PARSER]: Args is 0x1400010b470
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, []
+[PARSER]: mixedOpt1: trying comment @ 27
+[PARSER]: mixedOpt1: trying block @ 27
+[PARSER]: mixedOpt1: trying comment @ 134
+[PARSER]: mixedOpt1: trying block @ 134
+[PARSER]: mixedOpt1: trying for @ 134
+[PARSER]: mixedOpt1: trying if @ 134
+[PARSER]: mixedOpt1: trying plain @ 134
+[PARSER]: mixedOpt1: got plain: Plain("
+
+")@[10,1]
+[PARSER]: mixedOpt1: trying comment @ 136
+[PARSER]: mixedOpt1: trying block @ 136
+[PARSER]: mixedOpt1: trying for @ 136
+[PARSER]: mixedOpt1: trying if @ 136
+[PARSER]: mixedOpt1: trying plain @ 136
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "Layout"
+[PARSER]: full methodCall name: "Layout()"
+
+[PARSER]: mixedOpt1: trying comment @ 147
+[PARSER]: mixedOpt1: trying block @ 147
+[PARSER]: mixedOpt1: trying for @ 147
+[PARSER]: mixedOpt1: trying if @ 147
+[PARSER]: mixedOpt1: trying plain @ 147
+[PARSER]: mixedOpt1: got plain: Plain("
+    <div>
+        ")@[12,11]
+[PARSER]: mixedOpt1: trying comment @ 166
+[PARSER]: mixedOpt1: trying block @ 166
+[PARSER]: mixedOpt1: trying for @ 166
+[PARSER]: mixedOpt1: trying if @ 166
+[PARSER]: mixedOpt1: trying comment @ 181
+[PARSER]: mixedOpt1: trying block @ 181
+[PARSER]: mixedOpt1: trying for @ 181
+[PARSER]: mixedOpt1: trying if @ 181
+[PARSER]: mixedOpt1: trying plain @ 181
+[PARSER]: mixedOpt1: got plain: Plain("
+            <hr />
+        ")@[14,23]
+[PARSER]: mixedOpt1: trying comment @ 209
+[PARSER]: mixedOpt1: trying block @ 209
+[PARSER]: mixedOpt1: trying for @ 209
+[PARSER]: mixedOpt1: trying if @ 209
+[PARSER]: mixedOpt1: trying plain @ 209
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: Got blk &[Plain("
+            <hr />
+        ")@[14,23]]
+[PARSER]: mixedOpt1: trying comment @ 210
+[PARSER]: mixedOpt1: trying block @ 210
+[PARSER]: mixedOpt1: trying for @ 210
+[PARSER]: mixedOpt1: trying if @ 210
+[PARSER]: mixedOpt1: trying plain @ 210
+[PARSER]: mixedOpt1: got plain: Plain("
+        <h2>")@[16,9]
+[PARSER]: mixedOpt1: trying comment @ 223
+[PARSER]: mixedOpt1: trying block @ 223
+[PARSER]: mixedOpt1: trying for @ 223
+[PARSER]: mixedOpt1: trying if @ 223
+[PARSER]: mixedOpt1: trying plain @ 223
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "name"
+[PARSER]: full methodCall name: "name"
+
+[PARSER]: expression was not null: GoExp("name", { metadata: 0, [] })@[17,13]
+
+[PARSER]: mixedOpt1: trying comment @ 228
+[PARSER]: mixedOpt1: trying block @ 228
+[PARSER]: mixedOpt1: trying for @ 228
+[PARSER]: mixedOpt1: trying if @ 228
+[PARSER]: mixedOpt1: trying plain @ 228
+[PARSER]: mixedOpt1: got plain: Plain("</h2>
+        <h3>")@[17,17]
+[PARSER]: mixedOpt1: trying comment @ 246
+[PARSER]: mixedOpt1: trying block @ 246
+[PARSER]: mixedOpt1: trying for @ 246
+[PARSER]: mixedOpt1: trying if @ 246
+[PARSER]: mixedOpt1: trying plain @ 246
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "foo"
+[PARSER]: full methodCall name: "foo"
+
+[PARSER]: expression was not null: GoExp("foo", { metadata: 0, [] })@[18,13]
+
+[PARSER]: mixedOpt1: trying comment @ 250
+[PARSER]: mixedOpt1: trying block @ 250
+[PARSER]: mixedOpt1: trying for @ 250
+[PARSER]: mixedOpt1: trying if @ 250
+[PARSER]: mixedOpt1: trying plain @ 250
+[PARSER]: mixedOpt1: got plain: Plain("</h3>
+        <script>
+            document.body.addEventListener("load", () => {")@[18,16]
+[PARSER]: mixedOpt1: trying comment @ 331
+[PARSER]: mixedOpt1: trying block @ 331
+[PARSER]: mixedOpt1: trying for @ 331
+[PARSER]: mixedOpt1: trying if @ 331
+[PARSER]: mixedOpt1: trying plain @ 331
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: expression was not null: GoExp("Layout()", { metadata: 0, [[Plain("
+    <div>
+        ")@[12,11] GoIf(" index > 0 ", [[Plain("
+            <hr />
+        ")@[14,23]] []])@[0,0] Plain("
+        <h2>")@[16,9] GoExp("name", { metadata: 0, [] })@[17,13] Plain("</h2>
+        <h3>")@[17,17] GoExp("foo", { metadata: 0, [] })@[18,13] Plain("</h3>
+        <script>
+            document.body.addEventListener("load", () => {")@[18,16]]] })@[12,1]
+
+[PARSER]: mixedOpt1: trying comment @ 332
+[PARSER]: mixedOpt1: trying block @ 332
+[PARSER]: mixedOpt1: trying for @ 332
+[PARSER]: mixedOpt1: trying if @ 332
+[PARSER]: mixedOpt1: trying plain @ 332
+[PARSER]: mixedOpt1: got plain: Plain(")
+        </script>
+    </div>
+")@[20,59]
+[PARSER]: mixedOpt1: trying comment @ 363
+[PARSER]: mixedOpt1: trying block @ 363
+[PARSER]: mixedOpt1: trying for @ 363
+[PARSER]: mixedOpt1: trying if @ 363
+[PARSER]: mixedOpt1: trying plain @ 363
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating transcluded
+Parsing useOther
+[PARSER]: Args is 0x1400010b7a0
+
+[PARSER]: Looking for top imports
+[PARSER]: TopImports, []
+[PARSER]: mixedOpt1: trying comment @ 19
+[PARSER]: mixedOpt1: trying block @ 19
+[PARSER]: mixedOpt1: trying for @ 19
+[PARSER]: mixedOpt1: trying if @ 19
+[PARSER]: mixedOpt1: trying plain @ 19
+[PARSER]: mixedOpt1: got plain: Plain("<div>
+")@[3,0]
+[PARSER]: mixedOpt1: trying comment @ 25
+[PARSER]: mixedOpt1: trying block @ 25
+[PARSER]: mixedOpt1: trying for @ 25
+[PARSER]: mixedOpt1: trying comment @ 54
+[PARSER]: mixedOpt1: trying block @ 54
+[PARSER]: mixedOpt1: trying for @ 54
+[PARSER]: mixedOpt1: trying if @ 54
+[PARSER]: mixedOpt1: trying plain @ 54
+[PARSER]: mixedOpt1: got plain: Plain("
+    ")@[4,29]
+[PARSER]: mixedOpt1: trying comment @ 59
+[PARSER]: mixedOpt1: trying block @ 59
+[PARSER]: mixedOpt1: trying for @ 59
+[PARSER]: mixedOpt1: trying if @ 59
+[PARSER]: mixedOpt1: trying plain @ 59
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: getting identifier
+
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: Identifier anyUntil
+[PARSER]: methodCall name: "TestAll"
+[PARSER]: full methodCall name: "TestAll(name, i)"
+
+[PARSER]: expression was not null: GoExp("TestAll(name, i)", { metadata: 0, [] })@[5,5]
+
+[PARSER]: mixedOpt1: trying comment @ 76
+[PARSER]: mixedOpt1: trying block @ 76
+[PARSER]: mixedOpt1: trying for @ 76
+[PARSER]: mixedOpt1: trying if @ 76
+[PARSER]: mixedOpt1: trying plain @ 76
+[PARSER]: mixedOpt1: got plain: Plain("
+")@[5,21]
+[PARSER]: mixedOpt1: trying comment @ 77
+[PARSER]: mixedOpt1: trying block @ 77
+[PARSER]: mixedOpt1: trying for @ 77
+[PARSER]: mixedOpt1: trying if @ 77
+[PARSER]: mixedOpt1: trying plain @ 77
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+[PARSER]: mixedOpt1: trying comment @ 78
+[PARSER]: mixedOpt1: trying block @ 78
+[PARSER]: mixedOpt1: trying for @ 78
+[PARSER]: mixedOpt1: trying if @ 78
+[PARSER]: mixedOpt1: trying plain @ 78
+[PARSER]: mixedOpt1: got plain: Plain("
+</div>
+")@[6,1]
+[PARSER]: mixedOpt1: trying comment @ 86
+[PARSER]: mixedOpt1: trying block @ 86
+[PARSER]: mixedOpt1: trying for @ 86
+[PARSER]: mixedOpt1: trying if @ 86
+[PARSER]: mixedOpt1: trying plain @ 86
+[PARSER]: mixedOpt1: trying expression
+[PARSER]: expression
+[PARSER]: mixedOpt1: giving up
+Generating useOther
+Completed generating 7 templates

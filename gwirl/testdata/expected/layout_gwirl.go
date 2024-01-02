@@ -1,14 +1,12 @@
 package html
 
 import (
-    "strings"
-
     "github.com/gamebox/gwirl"
 )
 
 
 func Layout(content string) string {
-    sb_ := strings.Builder{}
+    sb_ := gwirl.TemplateBuilder{}
 
     if  content == ""  {
         sb_.WriteString(`
@@ -20,26 +18,21 @@ func Layout(content string) string {
     sb_.WriteString(`
 <html>
     <head>
-        `)
-
-        
-
-
-    sb_.WriteString(`
         <title>`)
 
     gwirl.WriteEscapedHTML(&sb_, content)
 
-    sb_.WriteString(`!</title>
+    sb_.WriteString(`</title>
     </head>
-    <body>
+    <body hx-boost="true">
         <nav class="nav"></nav>
         <main>`)
 
-    gwirl.WriteEscapedHTML(&sb_, content)
+    sb_.WriteString(content)
 
     sb_.WriteString(`</main>
         <footer></footer>
+        <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
     </body>
 </html>
 `)

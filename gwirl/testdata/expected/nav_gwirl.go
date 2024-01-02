@@ -1,19 +1,19 @@
 package html
 
 import (
-    "strings"
-
     "github.com/gamebox/gwirl"
 )
 
 
 func Nav(path string) string {
-    sb_ := strings.Builder{}
+    sb_ := gwirl.TemplateBuilder{}
 
     routes := []struct {    
     label string    
     path string    
-    }{}    
+    }{    
+    { "Home", "/" },    
+    }    
         
 
 
@@ -33,7 +33,7 @@ func Nav(path string) string {
 
         sb_.WriteString(`>`)
 
-        gwirl.WriteEscapedHTML(&sb_, route.label)
+        sb_.WriteString(route.label)
 
         sb_.WriteString(`</li>
         `)

@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-var testTemplates = []string{"base", "layout", "manageParticipants", "nav", "testAll", "transcluded", "useOther"}
+var testTemplates = []string{"base", "fun", "index", "layout", "manageParticipants", "nav", "testAll", "transcluded", "useOther"}
 
 func TestBuildSuccess(t *testing.T) {
 	cwd, _ := os.Getwd()
@@ -48,9 +50,20 @@ func TestBuildSuccess(t *testing.T) {
 		if expectedContents == "" {
 			t.Fatalf("No file contents for \"%s\"", entry.Name())
 		}
-		actualContents := string(contents)
-		if actualContents != expectedContents {
-			t.Fatalf("Template \"%s\" did not match", entry.Name())
+		if bytes.Compare([]byte(expectedContents), contents) != 0 {
+			t.Logf("Template \"%s\" did not match", entry.Name())
+			t.Log("----- Expected -----")
+			t.Log(showWhitespace(expectedContents))
+			t.Log("----- Received -----")
+			t.Log(showWhitespace(string(contents)))
+			// t.FailNow()
 		}
 	}
+}
+
+func showWhitespace(str string) string {
+	str = strings.ReplaceAll(str, " ", "•")
+	str = strings.ReplaceAll(str, "\t", "›")
+	str = strings.ReplaceAll(str, "\n", "⏎\n")
+	return str
 }

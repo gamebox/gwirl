@@ -1,4 +1,3 @@
-
 package gwirl
 
 import (
@@ -7,12 +6,16 @@ import (
 	"strings"
 )
 
+type TemplateBuilder struct {
+    strings.Builder
+}
+
 // Writes the 
-func WriteEscapedHTML(builder *strings.Builder, value interface{}) {
+func WriteEscapedHTML(builder *TemplateBuilder, value interface{}) {
     builder.WriteString(html.HTMLEscapeString(fmt.Sprintf("%v", value)))
 }
 
-func WriteRawHTML(builder *strings.Builder, value interface{}) {
+func WriteRawHTML(builder *TemplateBuilder, value interface{}) {
     builder.WriteString(fmt.Sprintf("%v", value))
 }
 

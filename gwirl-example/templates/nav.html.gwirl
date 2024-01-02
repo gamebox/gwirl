@@ -3,7 +3,9 @@
     routes := []struct {
         label string
         path string
-    }{}
+    }{
+        { "Home", "/" },
+    }
 }
 <nav class="navbar">
     <ul>

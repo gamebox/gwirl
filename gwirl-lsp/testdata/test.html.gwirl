@@ -1,0 +1,45 @@
+@*********************************************
+* This is a test comment                     *
+*********************************************@
+@(participants []model.Participant, total int)
+
+@import "github.com/gamebox/gwirl/gwirl-example/model"
+
+<div class="title-container">
+    <h1>Participant Manager</h1>
+    <a class="action" target="_blank" href="/cpc/">New</a>
+</div>
+
+<table class="list" cellspacing="0" cellpadding="0">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if len(participants) == 0 {
+            <tr>
+                <td colspan="4">No participants</td>
+            </tr>
+        }
+        @for _, participant := range participants {
+            <tr>
+                <td>@!participant.FirstName</td>
+                <td>@!participant.LastName</td>
+                <td>@!participant.Email</td>
+                <td>
+                    <a href="#" class="action">Delete</a>
+                    <a href="/client/participant/@participant.Id" class="action">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfooter>
+        <tr>
+            <td colspan="4">@len(participants) of @total</td>
+        </tr>
+    </tfooter>
+</table>

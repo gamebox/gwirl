@@ -1,14 +1,12 @@
 package views
 
 import (
-    "strings"
-
     "github.com/gamebox/gwirl"
 )
 
 
 func Testing(name string, index int) string {
-    sb_ := strings.Builder{}
+    sb_ := gwirl.TemplateBuilder{}
 
     sb_.WriteString(`<div>
 	`)

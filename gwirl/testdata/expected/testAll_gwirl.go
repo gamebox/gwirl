@@ -1,14 +1,12 @@
 package html
 
 import (
-    "strings"
-
     "github.com/gamebox/gwirl"
 )
 
 
 func TestAll(name string, index int) string {
-    sb_ := strings.Builder{}
+    sb_ := gwirl.TemplateBuilder{}
 
     sb_.WriteString(`<div `)
 
@@ -30,7 +28,7 @@ func TestAll(name string, index int) string {
     sb_.WriteString(`
     <h2>`)
 
-    gwirl.WriteEscapedHTML(&sb_, name)
+    sb_.WriteString(name)
 
     sb_.WriteString(`</h2>
 </div>

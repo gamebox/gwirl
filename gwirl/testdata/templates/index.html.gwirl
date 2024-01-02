@@ -1,0 +1,10 @@
+@(participants []model.Participant)
+
+@import "github.com/gamebox/gwirl/gwirl-example/model"
+
+@Base(nil, "Gwirl HTML Example", "/") {
+    <main class="bg-gray-500">
+        @ManageParticipants(participants)
+        @Fun("This is a message")
+    </main>
+}

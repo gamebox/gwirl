@@ -1,21 +1,22 @@
 @(flash *flash.Flash, title string, path string, embed string)
 
 @import "github.com/gamebox/gwirl/gwirl-example/flash"
+@import "fmt"
 
 <html lang="en" class="min-h-full">
     <head>
         <meta charset="UTF-8" />
-        <meta name="description" content="Astro description" />
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/logo.svg" />
         <title>@title</title>
-        <link rel="stylesheet" href="/assets/timebox.css">
+        <link rel="stylesheet" href="/assets/styles.css">
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
         <style>
         html {
             --accent: 22, 163, 74;
             --tb-logo-stroke-color: rgb(var(--accent));
-        }
+            color: white;
+        @}
         </style>
     </head>
     <body class="dark:bg-black min-h-full">
@@ -27,11 +28,12 @@
                     const flash = document.body.querySelector("#flash");
                     setTimeout(() => {
                         flash.close();
-                    }, 10 * 1000);
-                });
+                    @}, 10 * 1000);
+                @});
             </script>
         }
 
         @embed
+        <script src="https://unpkg.com/htmx.org@@1.9.10/dist/htmx.min.js"></script>
     </body>
 </html>
