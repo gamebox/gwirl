@@ -31,6 +31,75 @@ Similarly, you can escape opening `{` as `@{` and closing `}`s as `@}` if you
 are for instancing building a Go struct or slice in a if, for, Go block, or Go
 expression.
 
+## Getting started
+
+First, you should install the gwirl tool using `go get`:
+
+```
+go install github.com/gamebox/gwirl/gwirl
+```
+
+Then in the root of your project create a directory for your templates:
+
+```
+mkdir templates
+```
+
+Then create your first Gwirl file:
+
+```
+touch templates/hello.html.gwirl
+```
+
+Open that file and put in the following content:
+
+```html
+@(name string)
+
+<h1>Hello @name!</h1>
+```
+
+You can then render this out using a net/http handler, your web framework of
+choice, or even just a fmt.Print, like so:
+
+### Simple usage
+```go
+package main
+
+import (
+    "fmt"
+
+    "myproject.com/myproject/views/html"
+)
+
+func main() {
+    fmt.Println(views.Hello("World"))
+}
+```
+
+Then just run the following commands the first time:
+
+```
+> gwirl
+> go mod tidy
+> go run .
+```
+
+When you edit or add a template, just run `gwirl` and then `go run .`.
+
+You can also feel free to add a go:generate comment to the top of the file
+holding your `main()` function and then use `go generate` to generate the go
+files along with any other generated files you need.
+
+```go
+package main
+//go:generate gwirl
+
+func main() {
+    // ...
+}
+```
+
 ## Supported features
 
 ### Template parameters
