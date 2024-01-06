@@ -28,4 +28,6 @@ func TestParseTestAll2(t *testing.T) {
 	if len(result.Errors) > 0 {
 		t.Errorf("Expected no errors, found %d errors", len(result.Errors))
 	}
+    // TODO: Test content parsing better - maybe through parser/pretty print roundtrip?
+    t.Logf("%v", result.Template.Content)
 }

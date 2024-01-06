@@ -1,7 +1,5 @@
 name: CI
-on:
-  push:
-    branches: master
+on: [push]
 jobs:
   build:
     name: Build, lint, and test with Go version ${{ matrix.go }} and ${{ matrix.os }}
