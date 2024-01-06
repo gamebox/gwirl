@@ -447,6 +447,32 @@ func (p *Parser2) forExpression() *TemplateTree2 {
 	return result
 }
 
+func (p *Parser2) elseIfs() []TemplateTree2 {
+    trees := []TemplateTree2{}
+    for {
+        pos := p.input.offset()
+        p.whitespaceNoBreak()
+        if p.checkStr("@else if") {
+            condition := p.ifOrForDeclaration()
+            if condition == "" {
+                p.error("No condition found for else if", p.input.offset())
+                break
+            }
+            blk := p.expressionPart(true)
+            if blk == nil {
+                p.error("Empty block for else if", p.input.offset())
+                break
+            }
+            tree := NewTT2ElseIf(condition, *blk)
+            trees = append(trees, tree)
+        } else {
+            p.input.regressTo(pos)
+            break
+        }
+    }
+    return trees
+}
+
 func (p *Parser2) ifExpression() *TemplateTree2 {
 	var result *TemplateTree2 = nil
 	pos := p.input.offset()
@@ -459,7 +485,7 @@ func (p *Parser2) ifExpression() *TemplateTree2 {
 			p.logf("Got blk %v", blk)
 			if blk != nil {
 				// TODO: Get elseIfs
-
+                elseIfTrees = p.elseIfs()
 				elseTree = p.elseCall()
 
 				ifTree := NewTT2If(condition, *blk, elseIfTrees, elseTree)
@@ -479,7 +505,7 @@ func (p *Parser2) ifExpression() *TemplateTree2 {
 func (p *Parser2) elseCall() *TemplateTree2 {
 	reset := p.input.offset()
 	p.whitespaceNoBreak()
-	if p.checkStr("else") {
+	if p.checkStr("@else") {
 		p.whitespaceNoBreak()
 		blk := p.expressionPart(true)
 		if blk != nil {

@@ -14,29 +14,89 @@ import (
 //go:embed testdata/simple_gwirl.go
 var simple string
 
-func TestGenerator(t *testing.T) {
-	template := parser.NewTemplate2(
-		parser.NewPosString("Testing"),
-		nil,
-		parser.NewPosString("(name string, index int)"),
-		[]parser.PosString{},
-		[]parser.TemplateTree2{
-			parser.NewTT2Plain("<div>\n\t"),
-			parser.NewTT2If("if index > 0", []parser.TemplateTree2{
-				parser.NewTT2Plain("\n\t\t<hr />\n\t"),
-			}, nil, nil),
-			parser.NewTT2Plain("\n\t<h2>"),
-			parser.NewTT2GoExp("name", true, nil),
-			parser.NewTT2Plain("</h2>\n"),
-		},
-	)
+//go:embed testdata/testAll_gwirl.go
+var testAll string
 
-	gen := NewGenerator(false)
-	writer := strings.Builder{}
-	gen.Generate(template, "views", &writer)
-	if writer.String() != simple {
-		edits := myers.ComputeEdits(span.URI("testdata/simple_gwirl.go"), simple, writer.String())
-		diff := gotextdiff.ToUnified("expected", "received", simple, edits)
-		t.Fatalf("Generated template did not match golden:\n%s", diff)
+func ptr(t parser.TemplateTree2) *parser.TemplateTree2 {
+	return &t
+}
+
+var tests = []struct {
+	filename string
+	template parser.Template2
+	expected string
+}{
+	{
+		"testdata/simple_gwirl.go",
+		parser.NewTemplate2(
+			parser.NewPosString("Testing"),
+			nil,
+			parser.NewPosString("(name string, index int)"),
+			[]parser.PosString{},
+			[]parser.TemplateTree2{
+				parser.NewTT2Plain("<div>\n\t"),
+				parser.NewTT2If("if index > 0", []parser.TemplateTree2{
+					parser.NewTT2Plain("\n\t\t<hr />\n\t"),
+				}, nil, nil),
+				parser.NewTT2Plain("\n\t<h2>"),
+				parser.NewTT2GoExp("name", true, nil),
+				parser.NewTT2Plain("</h2>\n"),
+			},
+		),
+		simple,
+	},
+	{
+		"testdata/testAll_gwirl.go",
+		parser.NewTemplate2(
+			parser.NewPosString("TestAll"),
+			ptr(parser.NewTT2BlockComment("*****************\n* Test Component *\n*****************")),
+			parser.NewPosString("(name string, index int)"),
+			[]parser.PosString{},
+			[]parser.TemplateTree2{
+				parser.NewTT2Plain("<div "),
+				parser.NewTT2If(" index == 0 ", []parser.TemplateTree2{
+					parser.NewTT2Plain(` class="first" `),
+				}, []parser.TemplateTree2{}, nil),
+				parser.NewTT2Plain(">\n    "),
+				parser.NewTT2If(" index > 0 ", []parser.TemplateTree2{
+					parser.NewTT2Plain("\n        <hr />\n    "),
+				}, []parser.TemplateTree2{}, nil),
+				parser.NewTT2Plain("\n    "),
+				parser.NewTT2If(` name == "Jeff" `, []parser.TemplateTree2{
+					parser.NewTT2Plain("\n        <h2>JEFF</h2>\n    "),
+				}, []parser.TemplateTree2{
+					parser.NewTT2ElseIf(` name == "Sue" `, []parser.TemplateTree2{
+						parser.NewTT2Plain("\n        <h2>SuE</h2>\n    "),
+					}),
+					parser.NewTT2ElseIf(` name == "Bob" `, []parser.TemplateTree2{
+						parser.NewTT2Plain("\n        <h2>B.O.B.</h2>\n    "),
+					}),
+				}, ptr(parser.NewTT2Else([]parser.TemplateTree2{
+					parser.NewTT2Plain("\n        <h2>"),
+					parser.NewTT2GoExp("name", false, []parser.TemplateTree2{}),
+					parser.NewTT2Plain("</h2>\n    "),
+				}))),
+				parser.NewTT2Plain("\n</div>\n"),
+			},
+		),
+		testAll,
+	},
+}
+
+func TestGenerator(t *testing.T) {
+	for _, test := range tests {
+		res := t.Run(test.filename, func(t *testing.T) {
+			gen := NewGenerator(false)
+			writer := strings.Builder{}
+			gen.Generate(test.template, "views", &writer)
+			if writer.String() != test.expected {
+				edits := myers.ComputeEdits(span.URI("testdata/simple_gwirl.go"), test.expected, writer.String())
+				diff := gotextdiff.ToUnified("expected", "received", test.expected, edits)
+				t.Fatalf("Generated template did not match golden:\n%s", diff)
+			}
+		})
+		if !res {
+			t.Fail()
+		}
 	}
 }

@@ -152,6 +152,14 @@ func NewTT2If(condition string, content []TemplateTree2, elseIfTree []TemplateTr
 	}
 }
 
+func NewTT2ElseIf(condition string, content []TemplateTree2) TemplateTree2 {
+	return TemplateTree2{
+		Type:     TT2ElseIf,
+		Text:     condition,
+		Children: [][]TemplateTree2{content},
+	}
+}
+
 func NewTT2Else(content []TemplateTree2) TemplateTree2 {
 	return TemplateTree2{
 		Type:     TT2Else,

@@ -7,5 +7,13 @@
     @if index > 0 {
         <hr />
     }
-    <h2>@name</h2>
+    @if name == "Jeff" {
+        <h2>JEFF</h2>
+    } @else if name == "Sue" {
+        <h2>SuE</h2> {
+    } @else if name == "Bob" {
+        <h2>B.O.B.</h2>
+    } @else {
+        <h2>@name</h2>
+    }
 </div>
