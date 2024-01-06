@@ -100,6 +100,85 @@ func main() {
 }
 ```
 
+## Editor Support and LSP usage
+
+### Neovim
+
+Right now, the only editor that is supported for the Gwirl LSP is Neovim.
+
+#### Installation
+
+Until we have registered our config with nvim-lspconfig, you will have to create
+a custom LSP config manually.  If you are using `nvim-lspconfig`, the config
+should look like this:
+
+
+```lua
+local lsp_configurations = require('lspconfig.configs')
+
+if not lsp_configurations.gwirl then
+    lsp_configurations.gwirl = {
+        default_config = {
+            name = 'gwirl',
+            cmd = { 'gwirl-lsp' },
+            filetypes = { 'gwirl' },
+            root_dir = function()
+                local dir = vim.fs.dirname(vim.fs.find({ 'go.mod' }, { upward = true })[1])
+                return dir
+            end,
+            on_attach = function()
+                -- setup your LSP keybinds here.
+            end,
+            capabilities = {
+                textDocument = {
+                    augmentsSyntaxTokens = true,
+                    dynamicRegistration = true,
+                    formats = { "relative" },
+                    multilineTokenSupport = false,
+                    overlappingTokenSupport = true,
+                    requests = {
+                        full = {
+                            delta = false
+                        },
+                        range = false
+                    },
+                    serverCancelSupport = false,
+                },
+            },
+        }
+    }
+end
+```
+
+#### Configuration
+
+To make your Gwirl experience the best it can be in Neovim, we suggest adding
+a `gwirl.lua` file to your `ft` directory in the root of your Neovim config
+directory.  That file should contain the following:
+
+```lua
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+    pattern = {"*.html.gwirl"},
+    callback = function ()
+        vim.cmd("set filetype=gwirl")
+
+        vim.treesitter.language.register("html", {"gwirl"})
+        vim.treesitter.language.require_language("html")
+    end
+})
+
+-- add similar autocmds for other file types (txt, md, xml) if you use them with Gwirl
+```
+
+It's also recommended to add the following in some module called by your `init.lua`:
+
+```lua
+vim.treesitter.language.register("html", {"gwirl"})
+vim.treesitter.language.require_language("html")
+```
+
+And hopefully you have treesitter set up correctly.
+
 ## Supported features
 
 ### Template parameters
@@ -149,6 +228,11 @@ Use Go import statements the same as you would in Go to bring in needed helpers
 and other functionality.
 
 ### If/Else if/Else statements
+
+> [!NOTE]
+> Currently only `if` is supported, `if else` and `else` will be supported as part of
+[#11](https://github.com/gamebox/gwirl/issues/11).
+
 
 ```html
 <section @if showBorders {class="b-w-sm b-"}>
