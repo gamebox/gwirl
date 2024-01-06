@@ -229,12 +229,10 @@ and other functionality.
 
 ### If/Else if/Else statements
 
-{% note %}
-
-**Note:** Currently only `if` is supported, `if else` and `else` will be supported as part of
+> [!NOTE]
+> Currently only `if` is supported, `if else` and `else` will be supported as part of
 [#11](https://github.com/gamebox/gwirl/issues/11).
 
-{% endnote %}
 
 ```html
 <section @if showBorders {class="b-w-sm b-"}>
