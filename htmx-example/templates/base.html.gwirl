@@ -1,0 +1,12 @@
+@(title string, content string)
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@title</title>
+        <script src="https://unpkg.com/htmx.org@@1.9.10"></script>
+    </head>
+    <body>
+        @content
+    </body>
+</html>

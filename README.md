@@ -33,6 +33,10 @@ expression.
 
 ## Getting started
 
+> [!NOTE]
+> If you are interested in seeing an example of using Gwirl in an [HTMX](https://htmx.org)
+> app, take a look [here](/htmx-example)
+
 First, you should install the gwirl tool using `go get`:
 
 ```

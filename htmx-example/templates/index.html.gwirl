@@ -1,0 +1,10 @@
+@(count int)
+
+@Base("Gwirl HTMX - Home") {
+    <h1>Gwirl HTMX</h1>
+
+    @Counter(count)
+
+    <button hx-patch="/count" hx-target="#counter">Increment</button>
+}
+
