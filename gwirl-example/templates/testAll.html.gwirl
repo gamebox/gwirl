@@ -16,4 +16,10 @@
     } @else {
         <h2>@name</h2>
     }
+
+    @Card("title") {
+        <p>This is content in the card</p>
+    } {
+        <button>Card action</button>
+    }
 </div>

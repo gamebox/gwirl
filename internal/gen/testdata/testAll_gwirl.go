@@ -55,6 +55,31 @@ func TestAll(name string, index int) string {
     }
 
     sb_.WriteString(`
+
+    `)
+
+    var transclusion__20__5__0 string
+    {
+        sb_ := gwirl.TemplateBuilder{}
+        sb_.WriteString(`
+        <p>This is content in the card</p>
+    `)
+
+        transclusion__20__5__0 = sb_.String()
+    }
+    var transclusion__20__5__1 string
+    {
+        sb_ := gwirl.TemplateBuilder{}
+        sb_.WriteString(`
+        <button>Card action</button>
+    `)
+
+        transclusion__20__5__1 = sb_.String()
+    }
+    sb_.WriteString(Card("title", transclusion__20__5__0, transclusion__20__5__1))
+
+
+    sb_.WriteString(`
 </div>
 `)
 

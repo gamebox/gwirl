@@ -1,0 +1,9 @@
+@(title string, bodyContent string, footerContent string)
+
+<div class="card">
+    @if title == "" {<div class="header">
+        <h2>@title</h2>
+    </div>}
+    <div class="body">@bodyContent</div>
+    <div class="footer">@footerContent</div>
+</div>

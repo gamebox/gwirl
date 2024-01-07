@@ -127,33 +127,41 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		G.newlines()
 	case parser.TT2GoExp:
 		if len(tree.Children) > 0 {
-			varName := fmt.Sprintf("transclusion__%d__%d", tree.Line(), tree.Column())
-			G.write("var ")
-			G.writeNoIndent(varName)
-			G.writeNoIndent(" string\n")
-			G.write("{\n")
-			G.indent()
-			G.write("sb_ := gwirl.TemplateBuilder{}\n")
-			for _, child := range tree.Children[0] {
-				G.GenTemplateTree(child)
-			}
-			G.write(varName)
-			G.writeNoIndent(" = sb_.String()\n")
-			G.dedent()
-			G.write("}\n")
+            transclusionParams := strings.Builder{}
+            for i, transclusion := range tree.Children {
+                varName := fmt.Sprintf("transclusion__%d__%d__%d", tree.Line(), tree.Column(), i)
+                if i > 0 {
+                    transclusionParams.WriteString(", ")
+                }
+                transclusionParams.WriteString(varName)
+                G.write("var ")
+                G.writeNoIndent(varName)
+                G.writeNoIndent(" string\n")
+                G.write("{\n")
+                G.indent()
+                G.write("sb_ := gwirl.TemplateBuilder{}\n")
+                for _, child := range transclusion {
+                    G.GenTemplateTree(child)
+                }
+                G.write(varName)
+                G.writeNoIndent(" = sb_.String()\n")
+                G.dedent()
+                G.write("}\n")
+            }
 			if tree.Metadata.Has(parser.TTMDEscape) {
 				fmt.Printf("GoExp %v\n", tree)
 				G.write("gwirl.WriteEscapedHTML(&sb_, ")
 			} else {
 				G.write("sb_.WriteString(")
 			}
+            transclusionParamsStr := transclusionParams.String()
 			if strings.HasSuffix(tree.Text, "()") {
 				text, _ := strings.CutSuffix(tree.Text, ")")
-				text = text + varName + ")"
+				text = text + transclusionParamsStr + ")"
 				G.writeNoIndent(text)
 			} else if strings.HasSuffix(tree.Text, ")") {
 				text, _ := strings.CutSuffix(tree.Text, ")")
-				text = text + ", " + varName + ")"
+				text = text + ", " + transclusionParamsStr + ")"
 				G.writeNoIndent(text)
 			} else {
 				return errors.New("Transclusion can only occur with a method call")

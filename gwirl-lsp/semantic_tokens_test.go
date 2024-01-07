@@ -73,7 +73,6 @@ func TestCreateSemanticTokensForTemplate(t *testing.T) {
 	}
 	checkTokens(tokens, expected, t)
 	tokens = absTokensForContent(res.Template.Content)
-	t.Logf("tokens: %v", tokens)
 }
 
 func checkTokens(received []absToken, expected []absToken, t *testing.T) {
@@ -88,15 +87,15 @@ func checkTokens(received []absToken, expected []absToken, t *testing.T) {
 }
 
 func TestSemanticTokensFromAbsTokens(t *testing.T) {
-	tokens := []absToken{
-		{0, 0, 36, protocol.SemanticTokenComment},
-		{1, 0, 35, protocol.SemanticTokenComment},
-		{2, 0, 36, protocol.SemanticTokenComment},
-		{3, 2, 12, protocol.SemanticTokenParameter},
-	}
-	res := semanticTokensDataFromAbsTokens(tokens)
-	for i := 0; i < (len(res) / 5); i += 1 {
-		t.Logf("Token %d: %v", i, res[5*i:5*i+4])
-	}
-	t.Logf("Result: %v", res)
+	// tokens := []absToken{
+	// 	{0, 0, 36, protocol.SemanticTokenComment},
+	// 	{1, 0, 35, protocol.SemanticTokenComment},
+	// 	{2, 0, 36, protocol.SemanticTokenComment},
+	// 	{3, 2, 12, protocol.SemanticTokenParameter},
+	// }
+	// res := semanticTokensDataFromAbsTokens(tokens)
+	// for i := 0; i < (len(res) / 5); i += 1 {
+	// 	t.Logf("Token %d: %v", i, res[5*i:5*i+4])
+	// }
+	// t.Logf("Result: %v", res)
 }
