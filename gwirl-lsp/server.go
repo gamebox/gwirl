@@ -531,12 +531,10 @@ func (s *GwirlLspServer) DidChange(ctx context.Context, params *lsp.DidChangeTex
 		diagnostics[i] = d
 	}
 
-	if len(diagnostics) > 0 {
-		s.sendNotification("textDocument/publishDiagnostics", lsp.PublishDiagnosticsParams{
-			Diagnostics: diagnostics,
-			URI:         params.TextDocument.URI,
-		})
-	}
+    s.sendNotification("textDocument/publishDiagnostics", lsp.PublishDiagnosticsParams{
+        Diagnostics: diagnostics,
+        URI:         params.TextDocument.URI,
+    })
 
 	return nil
 }

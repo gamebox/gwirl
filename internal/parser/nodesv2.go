@@ -175,11 +175,7 @@ func NewTT2For(initialization string, blk []TemplateTree2) TemplateTree2 {
 	}
 }
 
-func NewTT2GoExp(content string, escape bool, transclusions []TemplateTree2) TemplateTree2 {
-	children := [][]TemplateTree2{}
-	if len(transclusions) > 0 {
-		children = append(children, transclusions)
-	}
+func NewTT2GoExp(content string, escape bool, transclusions [][]TemplateTree2) TemplateTree2 {
 	var metadata MetadataFlag
 	if escape {
 		metadata.Set(TTMDEscape)
@@ -188,7 +184,7 @@ func NewTT2GoExp(content string, escape bool, transclusions []TemplateTree2) Tem
 		Type:     TT2GoExp,
 		Text:     content,
 		Metadata: metadata,
-		Children: children,
+		Children: transclusions,
 	}
 }
 

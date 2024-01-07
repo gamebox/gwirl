@@ -369,21 +369,15 @@ func (p *Parser2) expression() *TemplateTree2 {
 	}
 
 	if !strings.HasSuffix(combinedExpression, ")") {
-		t := NewTT2GoExp(combinedExpression, escape, []TemplateTree2{})
+		t := NewTT2GoExp(combinedExpression, escape, [][]TemplateTree2{})
 		p.position(&t, pos)
 		return &t
 	}
 
-	blk := p.block()
-	if blk != nil {
-		t := NewTT2GoExp(combinedExpression, escape, *blk)
+    transclusions := p.multipleBlocks()
+		t := NewTT2GoExp(combinedExpression, escape, transclusions)
 		p.position(&t, pos)
 		return &t
-	} else {
-		t := NewTT2GoExp(combinedExpression, escape, []TemplateTree2{})
-		p.position(&t, pos)
-		return &t
-	}
 }
 
 func (p *Parser2) block() *[]TemplateTree2 {
@@ -415,6 +409,19 @@ func (p *Parser2) block() *[]TemplateTree2 {
 		p.input.regressTo(pos)
 	}
 	return result
+}
+
+func (p *Parser2) multipleBlocks() [][]TemplateTree2 {
+    blocks := [][]TemplateTree2{}
+    for {
+        blk := p.block()
+        if blk != nil {
+            blocks = append(blocks, *blk)
+        } else {
+            break
+        }
+    }
+    return blocks
 }
 
 func (p *Parser2) expressionPart(blockArgsAllowed bool) *[]TemplateTree2 {

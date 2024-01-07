@@ -17,8 +17,24 @@ var simple string
 //go:embed testdata/testAll_gwirl.go
 var testAll string
 
+type SimplePosition struct {
+    line int
+    column int
+}
+func (p SimplePosition) Line() int {
+    return p.line
+}
+func (p SimplePosition) Column() int {
+    return p.column
+}
+
 func ptr(t parser.TemplateTree2) *parser.TemplateTree2 {
 	return &t
+}
+
+func withPos(t *parser.TemplateTree2, pos SimplePosition) parser.TemplateTree2 {
+    t.SetPos(pos)
+    return *t
 }
 
 var tests = []struct {
@@ -73,9 +89,18 @@ var tests = []struct {
 					}),
 				}, ptr(parser.NewTT2Else([]parser.TemplateTree2{
 					parser.NewTT2Plain("\n        <h2>"),
-					parser.NewTT2GoExp("name", false, []parser.TemplateTree2{}),
+					parser.NewTT2GoExp("name", false, [][]parser.TemplateTree2{}),
 					parser.NewTT2Plain("</h2>\n    "),
 				}))),
+                parser.NewTT2Plain("\n\n    "),
+                withPos(ptr(parser.NewTT2GoExp(`Card("title")`, false, [][]parser.TemplateTree2{
+                    {
+                        parser.NewTT2Plain("\n        <p>This is content in the card</p>\n    "),
+                    },
+                    {
+                        parser.NewTT2Plain("\n        <button>Card action</button>\n    "),
+                    },
+                })), SimplePosition{20, 5}),
 				parser.NewTT2Plain("\n</div>\n"),
 			},
 		),
@@ -90,7 +115,7 @@ func TestGenerator(t *testing.T) {
 			writer := strings.Builder{}
 			gen.Generate(test.template, "views", &writer)
 			if writer.String() != test.expected {
-				edits := myers.ComputeEdits(span.URI("testdata/simple_gwirl.go"), test.expected, writer.String())
+				edits := myers.ComputeEdits(span.URI(test.filename), test.expected, writer.String())
 				diff := gotextdiff.ToUnified("expected", "received", test.expected, edits)
 				t.Fatalf("Generated template did not match golden:\n%s", diff)
 			}
