@@ -214,6 +214,50 @@ be rendered as a string directly into the content using the `Stringer`
 interface. Use the `@!` syntax to render content with escaping that is
 appropriate to the content's filetype.
 
+#### Transclusions
+
+There are cases of using another template where you want to pass actual template
+content to the other template, like a base or layout template.  You can do that
+in Gwirl using _transclusions_:
+
+```html
+@()
+
+@Layout() {
+    <div>
+    @* The rest of your page *@
+    </div>
+}
+```
+
+And sometimes a template will have multiple slots for content, and Gwirl can 
+handle that with multiple transclusions.
+
+Given a `card.html.gwirl`:
+
+```html
+@(title string, bodyContent string, headerContent string)
+
+@* ... *@
+```
+
+You can have another template call it like below:
+
+```html
+@()
+
+@* ... *@
+
+@Card("title") { @* slot: body *@
+    <p>This is content in the card</p>
+} { @* slot: footer *@
+    <button>Card action</button>
+}
+```
+
+> [!NOTE]
+> Each transclusion block can be separated by any number of spaces, but no newlines.
+
 ### Imports
 
 ```gwirl
@@ -229,13 +273,8 @@ and other functionality.
 
 ### If/Else if/Else statements
 
-> [!NOTE]
-> Currently only `if` is supported, `if else` and `else` will be supported as part of
-[#11](https://github.com/gamebox/gwirl/issues/11).
-
-
 ```html
-<section @if showBorders {class="b-w-sm b-"}>
+<section @if showBorders {class="b-w-sm b-"} @else {class=""}>
 ```
 
 Conditionally render content using `@if` the same way you would in Go, anything
