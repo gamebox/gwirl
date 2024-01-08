@@ -1,0 +1,30 @@
+@(todos []todo.Todo, filter todo.Filter, completedRemain bool)
+
+@import "github.com/gamebox/gwirl/htmx-example/todo"
+
+@Base("Gwirl HTMX - TodoMVC") {
+    <section class="todoapp" hx-trigger="todos-updated" hx-get="/todocount" hx-target="#todoCount" hx-swap="innerHTML">
+        <header class="header">
+            <h1>todos</h1>
+            @TodoInput(len(todos) == 0)
+        </header>
+        @if len(todos) > 0 {
+            @MainSection(todos, filter, completedRemain)
+        } @else {
+            <div id="listPlaceholder"></div>
+        }
+    </section>
+    <footer class="info">
+        <p>Double-click to edit a todo</p>
+        <!-- Remove the below line ↓ -->
+        <p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
+        <!-- Change this out with your name and url ↓ -->
+        <p>Created by <a href="http://anthonybullard.com">Anthony Bullard</a></p>
+        <p>Not really part of <a href="http://todomvc.com">TodoMVC</a> - it's powered by <a href="https://htmx.org">HTMX</a></p>
+    </footer>    
+} {
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/todo-base.css">
+    <link rel="stylesheet" href="/assets/todo-index.css">
+}

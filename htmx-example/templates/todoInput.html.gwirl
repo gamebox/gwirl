@@ -1,0 +1,17 @@
+@(firstItem bool)
+
+<input class="new-todo"
+   id="newTodo"
+   name="newTodo"
+   placeholder="What needs to be done?"
+   autofocus
+   hx-post="/todo" 
+   hx-trigger="keyup[key === 'Enter']" 
+   hx-swap-oob="true"
+   @if firstItem {
+   hx-target="#listPlaceholder"
+   hx-swap="outerHTML"
+   } @else {
+   hx-target="#todolist"
+   hx-swap="afterbegin"
+   }>

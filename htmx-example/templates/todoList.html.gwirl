@@ -1,0 +1,9 @@
+@(todos []todo.Todo)
+
+@import "github.com/gamebox/gwirl/htmx-example/todo"
+
+<ul class="todo-list" id="todolist">
+    @for _, todo := range todos {
+        @TodoItem(todo)
+    }
+</ul>

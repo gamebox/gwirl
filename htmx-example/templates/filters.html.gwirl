@@ -1,0 +1,15 @@
+@(filter todo.Filter)
+
+@import "github.com/gamebox/gwirl/htmx-example/todo"
+
+<ul class="filters" id="filters">
+    <li>
+        <a @if filter.IsAll() {class="selected"} hx-push-url="?filter=all" hx-get="/todofilter?filter=all" hx-target="#filters">All</a>
+    </li>
+    <li>
+        <a @if filter.IsActive() {class="selected"} hx-push-url="?filter=active" hx-get="/todofilter?filter=active" hx-target="#filters">Active</a>
+    </li>
+    <li>
+        <a @if filter.IsCompleted() {class="selected"} hx-push-url="?filter=completed" hx-get="/todofilter?filter=completed" hx-target="#filters">Completed</a>
+    </li>
+</ul>
