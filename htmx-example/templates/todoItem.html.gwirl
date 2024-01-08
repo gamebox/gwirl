@@ -1,31 +1,29 @@
 @(todo todo.Todo)
 
-@import "fmt"
 @import "strings"
 @import "github.com/gamebox/gwirl/htmx-example/todo"
 
 @{
-    idString := fmt.Sprintf("%d", todo.Id)
     sb := strings.Builder{}
     if todo.Completed { sb.WriteString("completed") }
     if todo.Editing { sb.WriteString("editing") }
     itemClasses := sb.String()
 }
 
-<li id="todo-@idString" hx-target="#todo-@idString" hx-swap="outerHTML" class="@itemClasses">
+<li id="todo-@todo.Id" hx-target="#todo-@todo.Id" hx-swap="outerHTML" class="@itemClasses">
     @if !todo.Editing {<div class="view">
         <input class="toggle"
                type="checkbox"
                @if todo.Completed {checked}
-               hx-patch="/todo?action=complete&id=@idString">
-        <label hx-patch="/todo?action=edit&id=@idString" hx-trigger="dblclick">@todo.Text</label>
+               hx-patch="/todo?action=complete&id=@todo.Id">
+        <label hx-patch="/todo?action=edit&id=@todo.Id" hx-trigger="dblclick">@todo.Text</label>
         <button class="destroy"
-                hx-delete="/todo?id=@idString"
+                hx-delete="/todo?id=@todo.Id"
                 hx-swap="delete"></button>
     </div>} @else {
     <input class="edit"
            name="text"
            value="@todo.Text"
            hx-trigger="blur changed, keyup[key == 'Enter'] changed" 
-           hx-patch="/todo?action=update&id=@idString">}
+           hx-patch="/todo?action=update&id=@todo.Id">}
 </li>

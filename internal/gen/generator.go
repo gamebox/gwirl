@@ -152,7 +152,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 				fmt.Printf("GoExp %v\n", tree)
 				G.write("gwirl.WriteEscapedHTML(&sb_, ")
 			} else {
-				G.write("sb_.WriteString(")
+				G.write("gwirl.WriteRawHTML(&sb_, ")
 			}
             transclusionParamsStr := transclusionParams.String()
 			if strings.HasSuffix(tree.Text, "()") {
@@ -171,7 +171,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 			if tree.Metadata.Has(parser.TTMDEscape) {
 				G.write("gwirl.WriteEscapedHTML(&sb_, ")
 			} else {
-				G.write("sb_.WriteString(")
+				G.write("gwirl.WriteRawHTML(&sb_, ")
 			}
 			G.writeNoIndent(tree.Text)
 			G.writeNoIndent(")")
