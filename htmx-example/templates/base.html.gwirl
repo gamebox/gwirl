@@ -1,12 +1,14 @@
-@(title string, content string)
+@(title string, content string, head string)
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>@title</title>
         <script src="https://unpkg.com/htmx.org@@1.9.10"></script>
+        <script src="https://unpkg.com/htmx.org@@1.9.10/dist/ext/debug.js"></script>
+        @head
     </head>
-    <body>
+    <body hx-ext="debug">
         @content
     </body>
 </html>

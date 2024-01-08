@@ -6,5 +6,5 @@
     @Counter(count)
 
     <button hx-patch="/count" hx-target="#counter">Increment</button>
-}
+} {}
 
