@@ -47,7 +47,7 @@ func TestAll(name string, index int) string {
         sb_.WriteString(`
         <h2>`)
 
-        sb_.WriteString(name)
+        gwirl.WriteRawHTML(&sb_, name)
 
         sb_.WriteString(`</h2>
     `)
@@ -76,7 +76,7 @@ func TestAll(name string, index int) string {
 
         transclusion__20__5__1 = sb_.String()
     }
-    sb_.WriteString(Card("title", transclusion__20__5__0, transclusion__20__5__1))
+    gwirl.WriteRawHTML(&sb_, Card("title", transclusion__20__5__0, transclusion__20__5__1))
 
 
     sb_.WriteString(`

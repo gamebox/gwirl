@@ -1,6 +1,5 @@
 @(todos []todo.Todo, filter todo.Filter, completedRemain bool)
 
-@import "fmt"
 @import "github.com/gamebox/gwirl/htmx-example/todo"
 
 <section class="main">
@@ -9,7 +8,7 @@
     @TodoList(todos)
 </section>
 <footer class="footer" hx-get="/todos" hx-target="#todolist" hx-swap="outerHTML" hx-trigger="filter-updated">
-    <span class="todo-count"><strong id="todoCount">@fmt.Sprintf("%d", len(todos))</strong> item left</span>
+    <span class="todo-count"><strong id="todoCount">@len(todos)</strong> item left</span>
     @Filters(filter)
     @if completedRemain {<button class="clear-completed" hx-delete="/completed" hx-target="#todolist" hx-swap="outerHTML" hx-trigger="click">Clear completed</button>}
 </footer>

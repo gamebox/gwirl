@@ -1,5 +1,3 @@
 @(count int)
 
-@import "fmt"
-
-<p id="counter" class="count">@fmt.Sprintf("%d", count)</p>
+<p id="counter" class="count">@count</p>
