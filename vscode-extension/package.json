@@ -1,0 +1,87 @@
+{
+    "name": "gwirl-vscode",
+    "description": "A VSCode extension for the Gwirl template language",
+    "author": "Anthony Bullard",
+    "license": "MIT",
+    "version": "0.5.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/gamebox/gwirl"
+    },
+    "publisher": "gwirl",
+    "categories": [],
+    "keywords": [
+        "gwirl",
+        "go",
+        "templates",
+        "lsp",
+        "language server"
+    ],
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "activationEvents": [
+        "onLanguage:gwirl"
+    ],
+    "main": "./client/out/extension",
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Gwirl configuration",
+            "properties": {
+                "languageServerExample.maxNumberOfProblems": {
+                    "scope": "resource",
+                    "type": "number",
+                    "default": 100,
+                    "description": "Controls the maximum number of problems produced by the server."
+                },
+                "languageServerExample.trace.server": {
+                    "scope": "window",
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "off",
+                    "description": "Traces the communication between VS Code and the language server."
+                }
+            }
+        },
+        "languages": [
+            {
+                "id": "gwirl",
+                "extensions": [
+                    ".gwirl"
+                ],
+                "aliases": [
+                    "gwirl",
+                    "Gwirl"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "gwirl",
+                "scopeName": "source.gwirl",
+                "path": "./syntaxes/gwirl.tmLanguage"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -b",
+        "watch": "tsc -b -w",
+        "lint": "eslint ./client/src --ext .ts,.tsx",
+        "postinstall": "cd client && npm install && cd ..",
+        "test": "echo \"No tests\""
+    },
+    "devDependencies": {
+        "@types/node": "^18.14.6",
+        "@typescript-eslint/eslint-plugin": "^6.14.0",
+        "@typescript-eslint/parser": "^6.14.0",
+        "eslint": "^8.56.0",
+        "typescript": "^5.3.3"
+    }
+}
