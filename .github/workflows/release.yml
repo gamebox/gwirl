@@ -11,9 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: setup node
         uses: actions/setup-node@v4
-      - run: cd vscode-extension
       - name: do the npm things
         run: |
+          cd vscode-extension
           npm ci
           npm i -g @vscode/vsce
           npm run compile 
