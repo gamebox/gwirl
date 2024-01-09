@@ -9,6 +9,7 @@ jobs:
     steps:
       - name: setup node
         uses: actions/setup-node@v4
+      - run: cd vscode-extension
       - name: get deps
         run: npm ci
       - name: get vsce
