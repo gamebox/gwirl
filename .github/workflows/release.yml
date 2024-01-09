@@ -1,24 +1,23 @@
+name: VSCode
 on:
   push:
     tags:
       - '*'
 jobs:
   build: 
-    name: Build vscode extension
+    name: Build vscode extension for ${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: setup node
         uses: actions/setup-node@v4
       - run: cd vscode-extension
-      - name: get deps
-        run: npm ci
-      - name: get vsce
-        run: npm i -g @vscode/vsce
-      - name: build extension
-        run: npm run compile 
-      - name: package extension
-        run: vsce package -o gwirl-vscode-${{ github.ref }}.vsix
+      - name: do the npm things
+        run: |
+          npm ci
+          npm i -g @vscode/vsce
+          npm run compile 
+          vsce package -o gwirl-vscode-${{ github.ref }}.vsix
       - name: upload artifact
         uses: actions/upload-release-asset@v1
         env:
