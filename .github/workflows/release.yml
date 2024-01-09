@@ -5,7 +5,7 @@ on:
       - '*'
 jobs:
   build: 
-    name: Build vscode extension for ${{ github.ref }}
+    name: Build vscode extension for ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,13 +17,13 @@ jobs:
           npm ci
           npm i -g @vscode/vsce
           npm run compile 
-          vsce package -o gwirl-vscode-${{ github.ref }}.vsix
+          vsce package -o gwirl-vscode-${{ github.ref_name }}.vsix
       - name: upload artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./gwirl-vscode-${{ github.ref }}.vsix
-          asset_name: gwirl-vscode-${{ github.ref }}.vsix
+          asset_path: ./gwirl-vscode-${{ github.ref_name }}.vsix
+          asset_name: gwirl-vscode-${{ github.ref_name }}.vsix
           asset_content_type: application/zip
