@@ -18,14 +18,15 @@ var simple string
 var testAll string
 
 type SimplePosition struct {
-    line int
-    column int
+	line   int
+	column int
 }
+
 func (p SimplePosition) Line() int {
-    return p.line
+	return p.line
 }
 func (p SimplePosition) Column() int {
-    return p.column
+	return p.column
 }
 
 func ptr(t parser.TemplateTree2) *parser.TemplateTree2 {
@@ -33,8 +34,8 @@ func ptr(t parser.TemplateTree2) *parser.TemplateTree2 {
 }
 
 func withPos(t *parser.TemplateTree2, pos SimplePosition) parser.TemplateTree2 {
-    t.SetPos(pos)
-    return *t
+	t.SetPos(pos)
+	return *t
 }
 
 var tests = []struct {
@@ -92,15 +93,15 @@ var tests = []struct {
 					parser.NewTT2GoExp("name", false, [][]parser.TemplateTree2{}),
 					parser.NewTT2Plain("</h2>\n    "),
 				}))),
-                parser.NewTT2Plain("\n\n    "),
-                withPos(ptr(parser.NewTT2GoExp(`Card("title")`, false, [][]parser.TemplateTree2{
-                    {
-                        parser.NewTT2Plain("\n        <p>This is content in the card</p>\n    "),
-                    },
-                    {
-                        parser.NewTT2Plain("\n        <button>Card action</button>\n    "),
-                    },
-                })), SimplePosition{20, 5}),
+				parser.NewTT2Plain("\n\n    "),
+				withPos(ptr(parser.NewTT2GoExp(`Card("title")`, false, [][]parser.TemplateTree2{
+					{
+						parser.NewTT2Plain("\n        <p>This is content in the card</p>\n    "),
+					},
+					{
+						parser.NewTT2Plain("\n        <button>Card action</button>\n    "),
+					},
+				})), SimplePosition{20, 5}),
 				parser.NewTT2Plain("\n</div>\n"),
 			},
 		),

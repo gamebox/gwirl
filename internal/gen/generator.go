@@ -9,31 +9,24 @@ import (
 	"github.com/gamebox/gwirl/internal/parser"
 )
 
-type IndentStyle = int
-
-const (
-	ISSpaces = iota
-	ISTabs
-)
-
 var (
-	tabIndent   []byte = []byte("\t")
-	spaceIndent []byte = []byte("    ")
+	tabIndent          = "\t"
+	spaceIndent        = "    "
 	newline     []byte = []byte("\n")
 )
 
 type Generator struct {
 	indentLevel int
-	indentStyle IndentStyle
+	indentStyle string
 	writer      io.Writer
 }
 
 func NewGenerator(useTabs bool) Generator {
 	g := Generator{}
 	if useTabs {
-		g.indentStyle = ISTabs
+		g.indentStyle = tabIndent
 	} else {
-		g.indentStyle = ISSpaces
+		g.indentStyle = spaceIndent
 	}
 	return g
 }
@@ -127,34 +120,34 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		G.newlines()
 	case parser.TT2GoExp:
 		if len(tree.Children) > 0 {
-            transclusionParams := strings.Builder{}
-            for i, transclusion := range tree.Children {
-                varName := fmt.Sprintf("transclusion__%d__%d__%d", tree.Line(), tree.Column(), i)
-                if i > 0 {
-                    transclusionParams.WriteString(", ")
-                }
-                transclusionParams.WriteString(varName)
-                G.write("var ")
-                G.writeNoIndent(varName)
-                G.writeNoIndent(" string\n")
-                G.write("{\n")
-                G.indent()
-                G.write("sb_ := gwirl.TemplateBuilder{}\n")
-                for _, child := range transclusion {
-                    G.GenTemplateTree(child)
-                }
-                G.write(varName)
-                G.writeNoIndent(" = sb_.String()\n")
-                G.dedent()
-                G.write("}\n")
-            }
+			transclusionParams := strings.Builder{}
+			for i, transclusion := range tree.Children {
+				varName := fmt.Sprintf("transclusion__%d__%d__%d", tree.Line(), tree.Column(), i)
+				if i > 0 {
+					transclusionParams.WriteString(", ")
+				}
+				transclusionParams.WriteString(varName)
+				G.write("var ")
+				G.writeNoIndent(varName)
+				G.writeNoIndent(" string\n")
+				G.write("{\n")
+				G.indent()
+				G.write("sb_ := gwirl.TemplateBuilder{}\n")
+				for _, child := range transclusion {
+					G.GenTemplateTree(child)
+				}
+				G.write(varName)
+				G.writeNoIndent(" = sb_.String()\n")
+				G.dedent()
+				G.write("}\n")
+			}
 			if tree.Metadata.Has(parser.TTMDEscape) {
 				fmt.Printf("GoExp %v\n", tree)
 				G.write("gwirl.WriteEscapedHTML(&sb_, ")
 			} else {
 				G.write("gwirl.WriteRawHTML(&sb_, ")
 			}
-            transclusionParamsStr := transclusionParams.String()
+			transclusionParamsStr := transclusionParams.String()
 			if strings.HasSuffix(tree.Text, "()") {
 				text, _ := strings.CutSuffix(tree.Text, ")")
 				text = text + transclusionParamsStr + ")"
@@ -182,16 +175,8 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 }
 
 func (G *Generator) write(str string) {
-	indent := 0
-	for indent < G.indentLevel {
-		if G.indentStyle == ISTabs {
-			G.writer.Write(tabIndent)
-		} else {
-			G.writer.Write(spaceIndent)
-		}
-		indent += 1
-	}
-	G.writer.Write([]byte(str))
+	indentation := strings.Repeat(G.indentStyle, G.indentLevel)
+	G.writer.Write([]byte(indentation + str))
 }
 
 func (G *Generator) writeln(str string) {
