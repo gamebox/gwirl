@@ -247,7 +247,6 @@ func (s *GwirlLspServer) Handle() {
 		case lsp.MethodTextDocumentHover:
 			go handleRequest[lsp.HoverParams, *lsp.Hover](s, method, s.Hover, s.context, bytes)
 		default:
-			s.logf("Not handling method \"%s\"", method)
 		}
 	}
 }
@@ -514,27 +513,12 @@ func (s *GwirlLspServer) DidChange(ctx context.Context, params *lsp.DidChangeTex
 
 	res := s.parser.Parse(s.fileContents[params.TextDocument.URI], params.TextDocument.URI.Filename())
 
-	diagnostics := make([]lsp.Diagnostic, len(res.Errors), len(res.Errors))
-	for i, e := range res.Errors {
-		s.logf("error: %v", e)
-		line := uint32(e.Line())
-		column := uint32(e.Column())
-		d := lsp.Diagnostic{
-			Range: lsp.Range{
-				Start: lsp.Position{Line: line, Character: column},
-				End:   lsp.Position{Line: line, Character: column},
-			},
-			Severity: lsp.DiagnosticSeverityError,
-			Source:   "gwirl-lsp",
-			Message:  e.String(),
-		}
-		diagnostics[i] = d
-	}
+	diagnostics := createDiagnosticsFromErrors(res.Errors)
 
-    s.sendNotification("textDocument/publishDiagnostics", lsp.PublishDiagnosticsParams{
-        Diagnostics: diagnostics,
-        URI:         params.TextDocument.URI,
-    })
+	s.sendNotification("textDocument/publishDiagnostics", lsp.PublishDiagnosticsParams{
+		Diagnostics: diagnostics,
+		URI:         params.TextDocument.URI,
+	})
 
 	return nil
 }
@@ -562,21 +546,7 @@ func (s *GwirlLspServer) DidOpen(ctx context.Context, params *lsp.DidOpenTextDoc
 
 	res := s.parser.Parse(params.TextDocument.Text, params.TextDocument.URI.Filename())
 
-	diagnostics := make([]lsp.Diagnostic, len(res.Errors), len(res.Errors))
-	for i, e := range res.Errors {
-		line := uint32(e.Line())
-		column := uint32(e.Column())
-		d := lsp.Diagnostic{
-			Range: lsp.Range{
-				Start: lsp.Position{Line: line, Character: column},
-				End:   lsp.Position{Line: line, Character: column},
-			},
-			Severity: lsp.DiagnosticSeverityError,
-			Source:   "gwirl-lsp",
-			Message:  e.String(),
-		}
-		diagnostics[i] = d
-	}
+	diagnostics := createDiagnosticsFromErrors(res.Errors)
 
 	s.sendNotification("textDocument/publishDiagnostics", lsp.PublishDiagnosticsParams{
 		Diagnostics: diagnostics,
@@ -724,4 +694,21 @@ func (s *GwirlLspServer) Moniker(ctx context.Context, params *lsp.MonikerParams)
 }
 func (s *GwirlLspServer) Request(ctx context.Context, method string, params interface{}) (result interface{}, err error) {
 	return nil, nil
+}
+
+func createDiagnosticsFromErrors(errors []parser.ParseError) []lsp.Diagnostic {
+	diagnostics := make([]lsp.Diagnostic, len(errors), len(errors))
+	for i, e := range errors {
+		d := lsp.Diagnostic{
+			Range: lsp.Range{
+				Start: ParserPosToLspPos(e.Start),
+				End:   ParserPosToLspPos(e.End),
+			},
+			Severity: lsp.DiagnosticSeverityError,
+			Source:   "gwirl-lsp",
+			Message:  e.Err,
+		}
+		diagnostics[i] = d
+	}
+	return diagnostics
 }

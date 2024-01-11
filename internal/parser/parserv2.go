@@ -45,7 +45,7 @@ import (
  */
 type Parser2 struct {
 	input      input
-	errorStack []PosString
+	errorStack []ParseError
 	logger     io.Writer
 }
 
@@ -92,11 +92,11 @@ func (p *Parser2) checkStr(str string) bool {
 	return false
 }
 
-func (p *Parser2) error(message string, offset int) {
-	posString := NewPosString(message)
-	p.logf("Error offset is %d", offset)
-	p.position(&posString, offset)
-	p.errorStack = append(p.errorStack, posString)
+func (p *Parser2) error(message string, startOffset, endOffset int) {
+	p.logf("Error starts at %d and ends at %d", startOffset, endOffset)
+	start := NewOffsetPosition(p.input.source(), startOffset)
+	end := NewOffsetPosition(p.input.source(), endOffset)
+	p.errorStack = append(p.errorStack, ParseError{message, start, end})
 }
 
 func (p *Parser2) any(length int) string {
@@ -139,20 +139,24 @@ func (p *Parser2) position(positional Positional, offset int) {
 	positional.SetPos(NewOffsetPosition(p.input.source(), offset))
 }
 
-func (p *Parser2) recursiveTag(prefix string, suffix string, allowStringLiterals bool) *string {
+func (p *Parser2) recursiveTag(prefix string, suffix string, allowStringLiterals bool, forbidNewlines bool) *string {
+	pos := p.input.offset()
 	if p.checkStr(prefix) {
 		stack := 1
 		sb := strings.Builder{}
 		sb.WriteString(prefix)
 		for stack > 0 {
-			if p.checkStr(prefix) {
+			if forbidNewlines && p.checkStr("\n") {
+				p.error("Unexpected newline", pos, p.input.offset())
+				stack = 0
+			} else if p.checkStr(prefix) {
 				stack = stack + 1
 				sb.WriteString(prefix)
 			} else if p.checkStr(suffix) {
 				stack = stack - 1
 				sb.WriteString(suffix)
 			} else if p.input.isEOF() {
-				p.error(fmt.Sprintf("Expected '%s', got end of file", suffix), p.input.offset())
+				p.error(fmt.Sprintf("Expected '%s', got end of file", suffix), pos, p.input.offset())
 				stack = 0
 			} else if allowStringLiterals {
 				s, err := p.stringLiteral("\"", "\\")
@@ -208,12 +212,12 @@ func several2[T any](p *Parser2, parser func(p *Parser2) *T, provided []*T) []*T
 	return provided
 }
 
-func (p *Parser2) parentheses() *string {
-	return p.recursiveTag("(", ")", true)
+func (p *Parser2) parentheses(forbidNewlines bool) *string {
+	return p.recursiveTag("(", ")", true, forbidNewlines)
 }
 
 func (p *Parser2) squareBrackets() *string {
-	return p.recursiveTag("[", "]", false)
+	return p.recursiveTag("[", "]", false, false)
 }
 
 func (p *Parser2) whitespaceNoBreak() *string {
@@ -282,7 +286,7 @@ func (p *Parser2) GoBlock() *TemplateTree2 {
 }
 
 func (p *Parser2) Brackets() string {
-	result := p.recursiveTag("{", "}", false)
+	result := p.recursiveTag("{", "}", false, false)
 	if result != nil && !strings.HasSuffix(*result, "}") {
 		result = nil
 	}
@@ -310,7 +314,7 @@ func (p *Parser2) methodCall() string {
 	if name != "" {
 		sb := strings.Builder{}
 		sb.WriteString(name)
-		parens := p.parentheses()
+		parens := p.parentheses(true)
 		if parens != nil {
 			sb.WriteString(*parens)
 		}
@@ -347,6 +351,29 @@ func (p *Parser2) chainedMethods() string {
 	return ""
 }
 
+var keywords = []string{
+	"func", "type", "struct", "interface", "return", "break", "continue", "select",
+	"break", "default", "func", "interface", "select",
+	"case", "defer", "go", "map", "struct",
+	"chan", "else", "goto", "package", "switch",
+	"const", "fallthrough", "if", "range", "type",
+	"continue", "for", "import", "return", "var",
+}
+
+func expressionContainsKeyword(expressionCode string) (string, bool) {
+	segments := strings.Split(expressionCode, ".")
+	if len(segments) == 0 {
+		return "", false
+	}
+	firstSegment := strings.Split(segments[0], "(")[0]
+	for i := range keywords {
+		if firstSegment == keywords[i] {
+			return keywords[i], true
+		}
+	}
+	return "", false
+}
+
 func (p *Parser2) expression() *TemplateTree2 {
 	p.log("expression")
 	if !p.checkStr("@") {
@@ -368,16 +395,23 @@ func (p *Parser2) expression() *TemplateTree2 {
 		combinedExpression += code
 	}
 
+	kw, containsKeyword := expressionContainsKeyword(combinedExpression)
+	if containsKeyword {
+		p.error(fmt.Sprintf("Illegal identifier: %s is a keyword", kw), pos, p.input.offset())
+		return nil
+	}
+
 	if !strings.HasSuffix(combinedExpression, ")") {
+		// TODO: check that first segment is not a Go or Gwirl keyword
 		t := NewTT2GoExp(combinedExpression, escape, [][]TemplateTree2{})
 		p.position(&t, pos)
 		return &t
 	}
 
-    transclusions := p.multipleBlocks()
-		t := NewTT2GoExp(combinedExpression, escape, transclusions)
-		p.position(&t, pos)
-		return &t
+	transclusions := p.multipleBlocks()
+	t := NewTT2GoExp(combinedExpression, escape, transclusions)
+	p.position(&t, pos)
+	return &t
 }
 
 func (p *Parser2) block() *[]TemplateTree2 {
@@ -396,7 +430,7 @@ func (p *Parser2) block() *[]TemplateTree2 {
 
 		accepted := p.accept("}")
 		if !accepted {
-			p.error(fmt.Sprintf("Expected '}', found end of file"), p.input.offset())
+			p.error(fmt.Sprintf("Expected '}', found end of file"), pos, p.input.offset())
 		}
 		flatMixed := []TemplateTree2{}
 		for _, m := range mixeds {
@@ -412,16 +446,16 @@ func (p *Parser2) block() *[]TemplateTree2 {
 }
 
 func (p *Parser2) multipleBlocks() [][]TemplateTree2 {
-    blocks := [][]TemplateTree2{}
-    for {
-        blk := p.block()
-        if blk != nil {
-            blocks = append(blocks, *blk)
-        } else {
-            break
-        }
-    }
-    return blocks
+	blocks := [][]TemplateTree2{}
+	for {
+		blk := p.block()
+		if blk != nil {
+			blocks = append(blocks, *blk)
+		} else {
+			break
+		}
+	}
+	return blocks
 }
 
 func (p *Parser2) expressionPart(blockArgsAllowed bool) *[]TemplateTree2 {
@@ -455,29 +489,29 @@ func (p *Parser2) forExpression() *TemplateTree2 {
 }
 
 func (p *Parser2) elseIfs() []TemplateTree2 {
-    trees := []TemplateTree2{}
-    for {
-        pos := p.input.offset()
-        p.whitespaceNoBreak()
-        if p.checkStr("@else if") {
-            condition := p.ifOrForDeclaration()
-            if condition == "" {
-                p.error("No condition found for else if", p.input.offset())
-                break
-            }
-            blk := p.expressionPart(true)
-            if blk == nil {
-                p.error("Empty block for else if", p.input.offset())
-                break
-            }
-            tree := NewTT2ElseIf(condition, *blk)
-            trees = append(trees, tree)
-        } else {
-            p.input.regressTo(pos)
-            break
-        }
-    }
-    return trees
+	trees := []TemplateTree2{}
+	for {
+		pos := p.input.offset()
+		p.whitespaceNoBreak()
+		if p.checkStr("@else if") {
+			condition := p.ifOrForDeclaration()
+			if condition == "" {
+				p.error("No condition found for else if", pos, p.input.offset())
+				break
+			}
+			blk := p.expressionPart(true)
+			if blk == nil {
+				p.error("Expected a block for else if", pos, p.input.offset())
+				break
+			}
+			tree := NewTT2ElseIf(condition, *blk)
+			trees = append(trees, tree)
+		} else {
+			p.input.regressTo(pos)
+			break
+		}
+	}
+	return trees
 }
 
 func (p *Parser2) ifExpression() *TemplateTree2 {
@@ -492,7 +526,7 @@ func (p *Parser2) ifExpression() *TemplateTree2 {
 			p.logf("Got blk %v", blk)
 			if blk != nil {
 				// TODO: Get elseIfs
-                elseIfTrees = p.elseIfs()
+				elseIfTrees = p.elseIfs()
 				elseTree = p.elseCall()
 
 				ifTree := NewTT2If(condition, *blk, elseIfTrees, elseTree)
@@ -626,7 +660,7 @@ func (p *Parser2) TemplateContent() []TemplateTree2 {
 		}
 		pos := p.input.offset()
 		if p.checkStr("@") {
-			p.error("Invalid '@' symbol", pos)
+			p.error("Invalid '@' symbol", pos, pos+1)
 		} else {
 			done = true
 		}
@@ -635,10 +669,16 @@ func (p *Parser2) TemplateContent() []TemplateTree2 {
 	return mixeds
 }
 
+type ParseError struct {
+	Err   string
+	Start Position
+	End   Position
+}
+
 type ParseResult2 struct {
 	Template Template2
 	Input    input
-	Errors   []PosString
+	Errors   []ParseError
 }
 
 func (p *Parser2) constructorArgs() *PosString {
@@ -665,7 +705,7 @@ func (p *Parser2) parseConstructorAndArgComment() (*Constructor, *TemplateTree2)
 }
 
 func (p *Parser2) templateArgs() *string {
-	return p.parentheses()
+	return p.parentheses(true)
 }
 
 func (p *Parser2) maybeTemplateArgs() *PosString {
@@ -688,7 +728,7 @@ func (p *Parser2) maybeTemplateArgs() *PosString {
 
 func (p *Parser2) Parse(source string, name string) ParseResult2 {
 	p.input.reset(source)
-	p.errorStack = make([]PosString, 0, 0)
+	p.errorStack = make([]ParseError, 0, 0)
 
 	_, comment := p.parseConstructorAndArgComment()
 	args := p.maybeTemplateArgs()
@@ -726,6 +766,6 @@ func NewParser2(source string) Parser2 {
 	in.reset(source)
 	return Parser2{
 		input:      in,
-		errorStack: make([]PosString, 0),
+		errorStack: make([]ParseError, 0),
 	}
 }

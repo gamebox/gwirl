@@ -7,15 +7,14 @@ import (
 )
 
 type TemplateBuilder struct {
-    strings.Builder
+	strings.Builder
 }
 
-// Writes the 
+// Writes the
 func WriteEscapedHTML(builder *TemplateBuilder, value interface{}) {
-    builder.WriteString(html.HTMLEscapeString(fmt.Sprintf("%v", value)))
+	builder.WriteString(html.HTMLEscapeString(fmt.Sprintf("%v", value)))
 }
 
 func WriteRawHTML(builder *TemplateBuilder, value interface{}) {
-    builder.WriteString(fmt.Sprintf("%v", value))
+	builder.WriteString(fmt.Sprintf("%v", value))
 }
-

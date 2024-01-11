@@ -27,6 +27,9 @@ func TestParseTestAll2(t *testing.T) {
 	}
 	if len(result.Errors) > 0 {
 		t.Errorf("Expected no errors, found %d errors", len(result.Errors))
+		for _, err := range result.Errors {
+			t.Errorf("%s [%d:%d-%d:%d]", err.Err, err.Start.Line(), err.Start.Column(), err.End.Line(), err.End.Column())
+		}
 	}
-    // TODO: Test content parsing better - maybe through parser/pretty print roundtrip?
+	// TODO: Test content parsing better - maybe through parser/pretty print roundtrip?
 }

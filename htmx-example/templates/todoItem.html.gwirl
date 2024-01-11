@@ -6,24 +6,27 @@
 @{
     sb := strings.Builder{}
     if todo.Completed { sb.WriteString("completed") }
-    if todo.Editing { sb.WriteString("editing") }
-    itemClasses := sb.String()
+    if todo.Editing { sb.WriteString(" editing") }
+    itemClasses := strings.Trim(sb.String())
 }
 
 <li id="todo-@todo.Id" hx-target="#todo-@todo.Id" hx-swap="outerHTML" class="@itemClasses">
-    @if !todo.Editing {<div class="view">
-        <input class="toggle"
-               type="checkbox"
-               @if todo.Completed {checked}
-               hx-patch="/todo?action=complete&id=@todo.Id">
-        <label hx-patch="/todo?action=edit&id=@todo.Id" hx-trigger="dblclick">@todo.Text</label>
-        <button class="destroy"
-                hx-delete="/todo?id=@todo.Id"
-                hx-swap="delete"></button>
-    </div>} @else {
-    <input class="edit"
-           name="text"
-           value="@todo.Text"
-           hx-trigger="blur changed, keyup[key == 'Enter'] changed" 
-           hx-patch="/todo?action=update&id=@todo.Id">}
+    @if !todo.Editing {
+        <div class="view">
+            <input class="toggle"
+                type="checkbox"
+                @if todo.Completed {checked}
+                hx-patch="/todo?action=complete&id=@todo.Id">
+            <label hx-patch="/todo?action=edit&id=@todo.Id" hx-trigger="dblclick">@todo.Text</label>
+            <button class="destroy"
+                    hx-delete="/todo?id=@todo.Id"
+                    hx-swap="delete"></button>
+        </div>
+    } @else {
+        <input class="edit"
+            name="text"
+            value="@todo.Text"
+            hx-trigger="blur changed, keyup[key == 'Enter'] changed" 
+            hx-patch="/todo?action=update&id=@todo.Id">
+    }
 </li>
