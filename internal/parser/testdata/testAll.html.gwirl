@@ -15,5 +15,6 @@
         <h2>B.O.B.</h2>
     } @else {
         <h2>@name</h2>
+        <p>This is a example of a need for a @(name)Safe expression</p>
     }
 </div>

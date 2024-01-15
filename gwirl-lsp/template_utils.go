@@ -251,13 +251,20 @@ func absTokensForContent(tt []parser.TemplateTree2) []absToken {
 		case parser.TT2GoExp:
 			length := len(t.Text)
 			var atToken absToken
-			if t.Metadata.Has(parser.TTMDEscape) {
+            if t.Metadata.Has(parser.TTMDSafe) && !t.Metadata.Has(parser.TTMDEscape) {
+                atToken = NewAbsToken(startLine, startCol-2, 2, lsp.SemanticTokenOperator)
+            } else if t.Metadata.Has(parser.TTMDEscape) && t.Metadata.Has(parser.TTMDSafe) {
+                atToken = NewAbsToken(startLine, startCol-3, 3, lsp.SemanticTokenOperator)
+            } else if t.Metadata.Has(parser.TTMDEscape) {
 				atToken = NewAbsToken(startLine, startCol-2, 2, lsp.SemanticTokenOperator)
 			} else {
 				atToken = NewAbsToken(startLine, startCol-1, 1, lsp.SemanticTokenOperator)
 			}
 			token := NewAbsToken(startLine, startCol, length, lsp.SemanticTokenParameter)
 			tokens = append(tokens, atToken, token)
+            if t.Metadata.Has(parser.TTMDSafe) {
+                tokens = append(tokens, NewAbsToken(startLine, startCol + uint32(length), 1, lsp.SemanticTokenOperator))
+            }
 			if t.Children == nil {
 				continue
 			}

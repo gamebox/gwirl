@@ -374,7 +374,28 @@ func expressionContainsKeyword(expressionCode string) (string, bool) {
 	return "", false
 }
 
-func (p *Parser2) expression() *TemplateTree2 {
+func (p *Parser2) SafeExpression() *TemplateTree2 {
+    p.log("SafeExpression")
+    escape := p.checkStr("@!(")
+    if !escape && !p.checkStr("@(") {
+        return nil
+    }
+    var t *TemplateTree2 = nil
+    p.input.regress(1)
+    pos := p.input.offset() + 1
+    code := p.parentheses(true)
+    if code == nil {
+        return t
+    }
+    content := strings.TrimPrefix(strings.TrimSuffix(*code, ")"), "(")
+    exp := NewTT2GoExpSafe(content, escape)
+    t = &exp
+    p.position(t, pos)
+
+    return t
+}
+
+func (p *Parser2) Expression() *TemplateTree2 {
 	p.log("expression")
 	if !p.checkStr("@") {
 		return nil
@@ -622,8 +643,14 @@ func (p *Parser2) Mixed() *TemplateTree2 {
 		p.logf("mixedOpt1: got plain: %v", plain)
 		return plain
 	}
+    p.logf("mixedOpt1: trying SafeExpression")
+    safeExp := p.SafeExpression()
+    if safeExp != nil {
+        p.logf("SafeExpression was not null: %v\n", safeExp)
+        return safeExp
+    }
 	p.logf("mixedOpt1: trying expression")
-	exp := p.expression()
+	exp := p.Expression()
 	if exp != nil {
 		p.logf("expression was not null: %v\n", exp)
 		return exp
