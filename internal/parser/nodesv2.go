@@ -99,6 +99,7 @@ type MetadataFlag int
 
 const (
 	TTMDEscape MetadataFlag = 1 << iota
+    TTMDSafe = 2
 )
 
 func (f MetadataFlag) Has(flag MetadataFlag) bool { return f&flag != 0 }
@@ -186,6 +187,20 @@ func NewTT2GoExp(content string, escape bool, transclusions [][]TemplateTree2) T
 		Metadata: metadata,
 		Children: transclusions,
 	}
+}
+
+func NewTT2GoExpSafe(content string, escape bool) TemplateTree2 {
+    var metadata MetadataFlag
+    metadata.Set(TTMDSafe)
+    if escape {
+        metadata.Set(TTMDEscape)
+    }
+    return TemplateTree2{
+        Type: TT2GoExp,
+        Text: content,
+        Metadata: metadata,
+        Children: [][]TemplateTree2{},
+    }
 }
 
 func NewTT2BlockComment(content string) TemplateTree2 {
