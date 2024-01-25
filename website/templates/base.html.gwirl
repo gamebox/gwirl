@@ -1,0 +1,22 @@
+@(page ssg.Page, content string)
+
+@import "github.com/gamebox/gwirl/website/ssg"
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>@page.Title()</title>
+    </head>
+    <body>
+        <aside>
+            <nav>
+                <ul>
+                @for _, item := range page.Site().TopLevelPages() {
+                    <li><a href="@item.Slug"/>@item.Title</a></li>
+                }
+                </ul>
+            </nav>
+        </aside>
+        @content
+    </body>
+</html>
