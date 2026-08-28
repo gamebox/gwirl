@@ -50,7 +50,6 @@ func (in *input) atEnd() bool {
 }
 
 func (in *input) pos() {
-
 }
 
 func (in *input) offset() int {

@@ -55,7 +55,7 @@ func (b *Builder) Printf(format string, vals ...any) {
 func (b *Builder) parse(f *File) (*parser.ParseResult2, error) {
 	b.Printf("Parsing %s\n", f.name)
 
-	result := b.parser.Parse(f.content, capitalize(f.name))
+	result := b.parser.Parse(f.content, capitalize(f.name), f.originalFilename)
 	if len(result.Errors) > 0 {
 		err := strings.Builder{}
 		err.WriteString(fmt.Sprintf("Could not parse file %s:\n", f.name+f.filetype+".gwirl"))

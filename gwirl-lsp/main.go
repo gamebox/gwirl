@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -41,16 +40,21 @@ func createLogFile() io.Writer {
 		log.Printf("Could not open log file: %v", err)
 		return logFileFallback()
 	}
-	log.Printf("Logging to %s", logFilePath)
+	//log.Printf("Logging to %s", logFilePath)
 	return logFile
 }
 
 func main() {
 	ctx := context.Background()
-	reader := bufio.NewReader(os.Stdin)
-	reader = bufio.NewReaderSize(reader, 40*1024)
 	logFile := createLogFile()
-	server := NewGwirlLspServer(os.Stdout, logFile, reader, ctx)
+    log.SetOutput(logFile)
+	server := NewGwirlLspServer(os.Stdout, logFile, os.Stdin, ctx)
+
+    defer func() {
+        if err := recover(); err != nil {
+            log.Printf("Something went wrong: %v", err)
+        }
+    }()
 
 	server.Handle()
 }

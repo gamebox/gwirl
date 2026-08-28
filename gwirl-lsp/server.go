@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,111 +8,49 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
+	"time"
 
+	"github.com/gamebox/gwirl/internal/gen"
 	"github.com/gamebox/gwirl/internal/parser"
+	"github.com/gamebox/gwirl/internal/pathutils"
 	"go.lsp.dev/jsonrpc2"
 	lsp "go.lsp.dev/protocol"
 	"go.lsp.dev/uri"
 )
 
-func readHeaders(r *bufio.Reader) (map[string]string, error) {
-	headers := map[string]string{}
-	bytes := make([]byte, 0, 100)
-	for {
-		str, err := r.ReadString('\n')
-		if err != nil && str != "" {
-			r.Read(bytes)
-			return headers, jsonrpc2.NewError(jsonrpc2.ParseError, "Could not parse headers")
-		}
-		if err != nil && str == "" {
-			r.Read(bytes)
-			return headers, nil
-		}
-		if strings.HasPrefix(str, "Content-Length:") && strings.HasSuffix(str, "\r\n") {
-			segments := strings.Split(str, ":")
-			value := strings.TrimLeft(segments[1], " ")
-			value = strings.TrimRight(value, "\r\n")
-			headers["Content-Length"] = value
-		}
-		if str == "\r\n" {
-			return headers, nil
-		}
-	}
+var pathConfig pathutils.PathConfig
+
+func init() {
+    pathConfig = pathutils.PathConfig{
+        TemplateBase: "templates",
+        DestBase: "views",
+    }
 }
 
-func (s *GwirlLspServer) readMessage() (string, []byte, error) {
-	headers, err := readHeaders(s.reader)
-	if err != nil {
-		return "", nil, jsonrpc2.NewError(jsonrpc2.ParseError, fmt.Sprintf("Failed to read headers: %v", err))
-	}
-	contentLength := headers["Content-Length"]
-	if contentLength == "0" {
-		return "", nil, nil
-	}
-	length, err := strconv.ParseUint(contentLength, 10, 64)
-	if err != nil {
-		length = 0
-	}
-	if length == 0 {
-		return "", []byte{}, nil
-	}
-	var bytesRead uint64 = 0
-	bytes := make([]byte, 0, 64000)
-	for bytesRead < length {
-		byte, err := s.reader.ReadByte()
-		if err != nil {
-			return "", nil, jsonrpc2.NewError(jsonrpc2.ParseError, "Could not read message body")
-		}
-		bytes = append(bytes, byte)
-		bytesRead += 1
-	}
-
-	var jsonMessage Message
-	err = json.Unmarshal(bytes, &jsonMessage)
-	if err != nil {
-		return "", nil, jsonrpc2.NewError(jsonrpc2.ParseError, "Could not decode message body")
-	}
-
-	return jsonMessage.Method, bytes, nil
+func handleResponse[I any](s *GwirlLspServer, method string, handler func(context.Context, *I) error, ctx context.Context, bytes []byte) {
+    var response jsonrpc2.Response
+    err := json.Unmarshal(bytes, &response)
+    if err != nil {
+        s.logf(`Method "%s" failed to unmarshal request: %e`, method, err)
+        return
+    }
+    var params I
+    err = json.Unmarshal(response.Result(), &params)
+    if err != nil || response.Err() != nil {
+        return
+    }
+    err = handler(ctx, &params)
+    if err != nil {
+        return
+    }
 }
 
-type Message struct {
-	Version string `json:"version"`
-	Method  string `json:"method"`
-}
-
-func (s *GwirlLspServer) WriteMessage(msg any) {
-	bytes, err := json.Marshal(msg)
-	if err != nil {
-		s.logf("Failed to write message msg=%v err=%v", msg, err)
-		return
-	}
-	length := len(bytes)
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	s.writer.Write([]byte("Content-Length: "))
-	s.writer.Write([]byte(fmt.Sprintf("%d", length)))
-	s.writer.Write([]byte("\r\n\r\n"))
-	s.writer.Write(bytes)
-}
-
-type LspRequest struct {
-	Id     json.RawMessage `json:"id"`
-	Method string          `json:"method"`
-	Params json.RawMessage `json:"params"`
-}
-
-type LspResponse struct {
-	Id     json.RawMessage `json:"id"`
-	Result json.RawMessage `json:"result"`
-	Error  *jsonrpc2.Error `json:"error,omitempty"`
-}
-
-func handleRequest[I any, O any](s *GwirlLspServer, method string, handler func(context.Context, *I) (O, error), ctx context.Context, bytes []byte) {
+func handleRequest[I any, O any](s *GwirlLspServer, request *jsonrpc2.Call, handler func(context.Context, *I) (O, error), ctx context.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			s.sendNotification(lsp.MethodWindowShowMessage, lsp.ShowMessageParams{
@@ -122,50 +59,45 @@ func handleRequest[I any, O any](s *GwirlLspServer, method string, handler func(
 			})
 		}
 	}()
-	var request LspRequest
-	err := json.Unmarshal(bytes, &request)
-	if err != nil {
-		s.logf(`Method "%s" failed to unmarshal request: %e`, method, err)
-		e := jsonrpc2.NewError(jsonrpc2.ParseError, fmt.Sprintf("Error handling method \"%s\": %v", method, err))
-		s.WriteMessage(e)
-		return
-	}
 	var params I
-	err = json.Unmarshal(request.Params, &params)
+    err := json.Unmarshal(request.Params(), &params)
+    method := request.Method()
 	if err != nil {
 		s.logf(`Method "%s" failed to unmarshal params: %e`, method, err)
 		e := jsonrpc2.NewError(jsonrpc2.ParseError, fmt.Sprintf("Error handling method \"%s\": %v", method, err))
-		s.WriteMessage(e)
+        msg, err := jsonrpc2.NewResponse(request.ID(), nil, e)
+        if err != nil {
+            s.logf("Failed to create jsonrpc2 response for request %d", request.ID())
+        }
+		s.host.WriteMessage(msg)
 		return
 	}
 	result, err := handler(ctx, &params)
 	if err != nil {
 		s.logf(`Method "%s" handler returned error: %e`, method, err)
-		s.WriteMessage(jsonrpc2.NewError(jsonrpc2.InternalError, fmt.Sprintf("Error handling method \"%s\": %v", method, err)))
-		return
-	}
-	r, err := json.Marshal(result)
-	if err != nil {
-		s.logf(`Method "%s" failed to marshal result: %e`, method, err)
-		s.WriteMessage(jsonrpc2.NewError(jsonrpc2.InternalError, fmt.Sprintf("Error writing response for method \"%s\": %v", method, err)))
+		e := jsonrpc2.NewError(jsonrpc2.ParseError, fmt.Sprintf("Error handling method \"%s\": %v", method, err))
+        msg, err := jsonrpc2.NewResponse(request.ID(), nil, e)
+        if err != nil {
+            s.logf("Failed to create jsonrpc2 response for request %d", request.ID())
+        }
+		s.host.WriteMessage(msg)
 		return
 	}
 	s.logf(`Method "%s" responding successfully`, method)
-	s.WriteMessage(LspResponse{
-		Id:     request.Id,
-		Result: r,
-	})
+    msg, err := jsonrpc2.NewResponse(
+        request.ID(),
+        result,
+        nil,
+    )
+    if err != nil {
+        return
+    }
+	s.host.WriteMessage(msg)
 }
 
-func handleNotification[I any](s *GwirlLspServer, method string, handler func(context.Context, *I) error, ctx context.Context, bytes []byte) {
-	var request LspRequest
-	err := json.Unmarshal(bytes, &request)
-	if err != nil {
-		s.logf("Error handling method : %v", err)
-		return
-	}
+func handleNotification[I any](s *GwirlLspServer, request *jsonrpc2.Notification, handler func(context.Context, *I) error, ctx context.Context) {
 	var params I
-	err = json.Unmarshal(request.Params, &params)
+    err := json.Unmarshal(request.Params(), &params)
 	if err != nil {
 		s.logf("Error handling method : %v", err)
 		return
@@ -177,31 +109,57 @@ func handleNotification[I any](s *GwirlLspServer, method string, handler func(co
 }
 
 type GwirlLspServer struct {
-	writer       io.Writer
-	reader       *bufio.Reader
 	logWriter    io.Writer
-	mutex        *sync.Mutex
 	logMutex     *sync.Mutex
 	openedFiles  []string
-	fileContents map[uri.URI]string
+    templateCache *TemplateCache
 	context      context.Context
 	parser       *parser.Parser2
+    gopls        *LspMsgRW
+    host         *LspMsgRW
+    goplscmd     *exec.Cmd
+    nextReqId    atomic.Uint32
+    pending      map[jsonrpc2.ID]chan *jsonrpc2.Response
+    pendingMutex *sync.Mutex
 }
 
-func NewGwirlLspServer(writer io.Writer, logWriter io.Writer, reader *bufio.Reader, context context.Context) *GwirlLspServer {
+func NewGwirlLspServer(writer io.Writer, logWriter io.Writer, reader io.Reader, context context.Context) *GwirlLspServer {
 	log.SetOutput(logWriter)
 	p := parser.NewParser2("")
+    goplscmd := exec.Command("/Users/anthonybullard/.local/share/nvim/mason/bin/gopls", "-verbose", "-logfile=/Users/anthonybullard/Library/Caches/gopls/gopls.log.txt")
+    goplsstdin, err := goplscmd.StdoutPipe()
+    goplsstdout, err := goplscmd.StdinPipe()
+    err = goplscmd.Start()
+    pending := map[jsonrpc2.ID]chan *jsonrpc2.Response{}
+    templateCache := NewTemplateCache()
 	s := GwirlLspServer{
-		writer:       writer,
-		reader:       reader,
 		logWriter:    logWriter,
-		mutex:        &sync.Mutex{},
 		logMutex:     &sync.Mutex{},
 		openedFiles:  make([]string, 10, 100),
-		fileContents: make(map[uri.URI]string, 10),
+        templateCache: &templateCache,
 		context:      context,
 		parser:       &p,
+        goplscmd:     goplscmd,
+        nextReqId:    atomic.Uint32{},
+        pending:      pending,
+        pendingMutex: &sync.Mutex{},
 	}
+    if err != nil {
+        s.logf("Could not start gopls: %v", err)
+    }
+    gopls, err := NewMsgRWFromIO(goplsstdin, goplsstdout)
+    if err != nil {
+        s.logf("Could not create readwriter for gopls: %v", err)
+        s.gopls = nil
+    } else {
+        s.gopls = &gopls
+    }
+    host, err := NewMsgRWFromIO(reader, writer)
+    if err != nil {
+        s.host = nil
+    } else {
+        s.host = &host
+    }
 
 	s.log("GwirlLspServer: Start")
 
@@ -215,40 +173,107 @@ type LspNotification struct {
 }
 
 func (s *GwirlLspServer) Handle() {
+    wg := sync.WaitGroup{}
+    wg.Add(1)
+    go s.handleClientRequests(&wg)
+    if s.gopls != nil && s.goplscmd.Process != nil {
+        s.logf("Started gopls with pid %d", s.goplscmd.Process.Pid)
+        wg.Add(1)
+        go s.handleGoPls(&wg)
+    }
+    wg.Wait()
+}
+
+func (s *GwirlLspServer) handleGoPls(wg *sync.WaitGroup) {
+    defer wg.Done()
+    for {
+        if s.goplscmd.Process == nil {
+            s.logf("gopls has exited :-(")
+            return
+        }
+        s.log("Waiting for message from gopls")
+        msg, err := s.gopls.ReadMessage()
+        if err != nil {
+            s.logf("Failed to read gopls message: %v", err)
+            continue
+        }
+        switch msg := msg.(type) {
+        case *jsonrpc2.Response:
+			s.log("==========================================")
+			s.logf("Received gopls response for request \"%d\"", msg.ID())
+			s.log("------------------------------------------")
+            s.pendingMutex.Lock()
+            c, ok := s.pending[msg.ID()]
+            defer s.pendingMutex.Unlock()
+            if ok {
+                delete(s.pending, msg.ID())
+                c<-msg
+            }
+            return
+        case *jsonrpc2.Notification:
+			s.log("==========================================")
+			s.logf("Received gopls notification for method \"%s\"", msg.Method())
+			s.log("------------------------------------------")
+        case *jsonrpc2.Call:
+            s.log("Ignoring request from gopls")
+            return
+        }
+    }
+}
+
+func (s *GwirlLspServer) handleClientRequests(wg *sync.WaitGroup) {
+    defer wg.Done()
 	for {
-		method, bytes, err := s.readMessage()
+		msg, err := s.host.ReadMessage()
 		if err != nil {
-			s.WriteMessage(err)
+            s.logf("Error occurred reading a message: %v", err)
 			return
 		}
-		if method != "" {
+        switch msg := msg.(type) {
+        case *jsonrpc2.Call:
+            method := msg.Method()
 			s.log("==========================================")
-			s.logf("Received message for method \"%s\"", method)
+			s.logf("Received client call for method \"%s\"", msg.Method())
 			s.log("------------------------------------------")
-		}
-		switch method {
-		case lsp.MethodInitialize:
-			go handleRequest[lsp.InitializeParams, *lsp.InitializeResult](s, method, s.Initialize, s.context, bytes)
-		case lsp.MethodInitialized:
-			go handleNotification[lsp.InitializedParams](s, method, s.Initialized, s.context, bytes)
-		case lsp.MethodShutdown:
-			s.log("Shutting down...")
-			os.Exit(0)
-		case lsp.MethodTextDocumentDidOpen:
-			go handleNotification[lsp.DidOpenTextDocumentParams](s, method, s.DidOpen, s.context, bytes)
-		case lsp.MethodTextDocumentDidChange:
-			go handleNotification[lsp.DidChangeTextDocumentParams](s, method, s.DidChange, s.context, bytes)
-		case lsp.MethodTextDocumentCompletion:
-			go handleRequest[lsp.CompletionParams, *lsp.CompletionList](s, method, s.Completion, s.context, bytes)
-		case lsp.MethodTextDocumentDefinition:
-			go handleRequest[lsp.DefinitionParams, []lsp.Location](s, method, s.Definition, s.context, bytes)
-		case lsp.MethodSemanticTokensFull:
-			go handleRequest[lsp.SemanticTokensParams, *lsp.SemanticTokens](s, method, s.SemanticTokensFull, s.context, bytes)
-		case lsp.MethodTextDocumentHover:
-			go handleRequest[lsp.HoverParams, *lsp.Hover](s, method, s.Hover, s.context, bytes)
-		default:
-		}
+            switch method {
+            case lsp.MethodInitialize:
+                go handleRequest[lsp.InitializeParams, *lsp.InitializeResult](s, msg, s.Initialize, s.context)
+            case lsp.MethodTextDocumentCompletion:
+                go handleRequest[lsp.CompletionParams, *lsp.CompletionList](s, msg, s.Completion, s.context)
+            case lsp.MethodTextDocumentDefinition:
+                go handleRequest[lsp.DefinitionParams, []lsp.Location](s, msg, s.Definition, s.context)
+            case lsp.MethodSemanticTokensFull:
+                go handleRequest[lsp.SemanticTokensParams, *lsp.SemanticTokens](s, msg, s.SemanticTokensFull, s.context)
+            case lsp.MethodTextDocumentHover:
+                go handleRequest[lsp.HoverParams, *lsp.Hover](s, msg, s.Hover, s.context)
+            case lsp.MethodShutdown:
+                s.log("Shutting down...")
+                s.sendGoPlsNotification(lsp.MethodShutdown, struct{}{})
+                return
+            default:
+            }
+        case *jsonrpc2.Notification:
+            method := msg.Method()
+			s.log("==========================================")
+			s.logf("Received client notification for method \"%s\"", msg.Method())
+			s.log("------------------------------------------")
+            switch method {
+            case lsp.MethodInitialized:
+                go handleNotification[lsp.InitializedParams](s, msg, s.Initialized, s.context)
+            case lsp.MethodTextDocumentDidOpen:
+                go handleNotification[lsp.DidOpenTextDocumentParams](s, msg, s.DidOpen, s.context)
+            case lsp.MethodTextDocumentDidChange:
+                go handleNotification[lsp.DidChangeTextDocumentParams](s, msg, s.DidChange, s.context)
+            }
+        case *jsonrpc2.Response:
+            s.log("Ignoring response from client")
+        }
 	}
+}
+
+func (s *GwirlLspServer) getReqId() uint32 {
+    id := s.nextReqId.Add(1)
+    return id
 }
 
 func (s *GwirlLspServer) log(message string) {
@@ -263,20 +288,80 @@ func (s *GwirlLspServer) logf(format string, data ...any) {
 	log.Printf("[SERVER]: "+format, data...)
 }
 
+func (s *GwirlLspServer) Write(bytes []byte) (n int, err error) {
+    s.logMutex.Lock()
+    defer s.logMutex.Unlock()
+    log.Println("Writing raw output on lines below\n-----------------")
+    n, err = log.Writer().Write(bytes)
+    log.Println("------------Raw output complete-------------")
+    return
+}
+
 func (s *GwirlLspServer) sendNotification(method string, notification any) {
-	if s.writer != nil {
-		params, err := json.Marshal(notification)
-		if err != nil {
-			s.logf("Could not send message: %v", notification)
-		}
-		n := LspNotification{
-			Version: "2.0",
-			Method:  method,
-			Params:  params,
-		}
-		s.logf("Sending notification \"%s\"", n.Method)
-		s.WriteMessage(n)
+	if s.host == nil {
+        return
 	}
+    n, err := jsonrpc2.NewNotification(
+        method,
+        notification,
+    )
+    if err != nil {
+        s.logf("Could not send message: %v", notification)
+        return
+    }
+    s.log("==========================================")
+    s.logf("Sending client notification for method \"%s\"", n.Method())
+    notiJson, err := json.Marshal(notification)
+    s.logf("%s\n", notiJson)
+    s.log("------------------------------------------")
+    s.host.WriteMessage(n)
+}
+
+func (s *GwirlLspServer) sendGoPlsRequest(method string, req any) (*jsonrpc2.Response, error) {
+    if s.gopls == nil {
+        s.logf("Cannot send %s request to gopls: gopls not started ", method)
+        return nil, errors.New("gopls not started")
+    }
+
+    reqId := jsonrpc2.NewNumberID(int32(s.getReqId()))
+    request, err := jsonrpc2.NewCall(
+        reqId,
+        method,
+        req,
+    )
+
+    s.log("==========================================")
+    s.logf("Sending gopls request for method \"%s\"", method)
+    notiJson, err := json.Marshal(req)
+    s.logf("%s\n", notiJson)
+    s.log("------------------------------------------")
+
+    err = s.gopls.WriteMessage(request)
+    if err != nil {
+        s.logf("Could not write %s request to gopls: %v", method, err)
+        return nil, errors.New("gopls write error")
+    }
+
+    responseChan := make(chan *jsonrpc2.Response, 1)
+    timeout, cancel := context.WithTimeout(s.context, 5 * time.Second)
+    defer cancel()
+
+    s.pendingMutex.Lock()
+    s.pending[reqId] = responseChan
+    s.pendingMutex.Unlock()
+
+    defer func() {
+        s.pendingMutex.Lock()
+        delete(s.pending, reqId)
+        s.pendingMutex.Unlock()
+    }()
+
+    select {
+        case response := <-responseChan:
+            return response, nil
+        case <- timeout.Done():
+            return nil, errors.New("response timeout")
+    }
 }
 
 func (s *GwirlLspServer) RetrieveWorkspaceTemplates(root string) {
@@ -301,20 +386,74 @@ func (s *GwirlLspServer) RetrieveWorkspaceTemplates(root string) {
 			continue
 		}
 		if strings.HasSuffix(entry.Name(), ".gwirl") {
-			s.logf("Loading %s", entries[idx])
 			contents, err := os.ReadFile(entries[idx])
 			if err != nil {
 				continue
 			}
+            var cacheItem TemplateCacheItem
+            result := s.parser.Parse(string(contents), entry.Name(), entry.Name())
+            if len(result.Errors) > 0 {
+                return
+            }
+            cacheItem.text = string(contents)
+            cacheItem.template = result.Template
+            sb := strings.Builder{}
+            g := gen.NewGenerator(false)
+            g.Generate(cacheItem.template, "html", )
 			s.fileContents[uri.File(entries[idx])] = string(contents)
 		}
 	}
 	s.logf("Loaded %d templates", len(s.fileContents))
 }
 
+func (s *GwirlLspServer) sendGoPlsNotification(method string, params any) error {
+    notification, err := jsonrpc2.NewNotification(method, params)
+    if err != nil {
+        s.logf("Error sending gopls notification for method %s: %v", method, err)
+        return err
+    }
+    s.log("==========================================")
+    s.logf("Sending gopls notification for method \"%s\"", method)
+    s.log("------------------------------------------")
+    s.gopls.WriteMessage(notification)
+    return nil
+}
+
 func (s *GwirlLspServer) Initialize(ctx context.Context, params *lsp.InitializeParams) (result *lsp.InitializeResult, err error) {
-	s.logf("Initialized with rootURI \"%s\" and rootPath \"%s\"", params.RootURI.Filename(), params.RootPath)
-	s.RetrieveWorkspaceTemplates(params.RootURI.Filename())
+	s.logf("Initializing with rootURI \"%s\" and rootPath \"%s\"", params.RootURI.Filename(), params.RootPath)
+	go s.RetrieveWorkspaceTemplates(params.RootURI.Filename())
+    response, err := s.sendGoPlsRequest(lsp.MethodInitialize, lsp.InitializeParams{
+       ProcessID: int32(os.Getpid()),
+       ClientInfo: &lsp.ClientInfo{
+           Name: "gwirl-lsp",
+           Version: "0.0.1",
+       },
+       Locale: params.Locale,
+       WorkspaceFolders: params.WorkspaceFolders,
+       RootPath: params.RootPath,
+       WorkDoneProgressParams: params.WorkDoneProgressParams,
+       InitializationOptions: params.InitializationOptions,
+       RootURI: params.RootURI,
+       Trace: params.Trace,
+       Capabilities: params.Capabilities,
+    })
+    if err == nil {
+        s.sendGoPlsNotification(lsp.MethodInitialized, lsp.InitializedParams{}) 
+    } else {
+        s.logf("Received error from gopls during initialize: %v", err)
+    }
+
+    var supportsSemanticHighlighting bool
+    var res *lsp.InitializeResult
+    err = json.Unmarshal(response.Result(), res)
+    if err == nil {
+        supportsSemanticHighlighting = res.Capabilities.SemanticTokensProvider != nil
+    }
+
+    if supportsSemanticHighlighting {
+        s.log("GOPLS SUPPORTS SEMANTIC HIGHLIGHTING")
+    }
+
 	return &lsp.InitializeResult{
 		Capabilities: lsp.ServerCapabilities{
 			TextDocumentSync: lsp.TextDocumentSyncKindFull,
@@ -403,7 +542,7 @@ var baseCompletionItems = []lsp.CompletionItem{
 
 func (s *GwirlLspServer) Completion(ctx context.Context, params *lsp.CompletionParams) (result *lsp.CompletionList, err error) {
 	list := lsp.CompletionList{}
-	presult := s.parser.Parse(s.fileContents[params.TextDocument.URI], params.TextDocument.URI.Filename())
+	presult := s.parser.Parse(s.fileContents[params.TextDocument.URI], params.TextDocument.URI.Filename(), params.TextDocument.URI.Filename())
 	tParams := GetTemplateParamNames(&presult.Template)
 	templateNames := TemplateNames(s.fileContents)
 	list.Items = make([]lsp.CompletionItem, len(baseCompletionItems), len(baseCompletionItems)+len(tParams)+len(templateNames))
@@ -427,6 +566,27 @@ func (s *GwirlLspServer) Completion(ctx context.Context, params *lsp.CompletionP
 			Kind:             lsp.CompletionItemKindFunction,
 		})
 	}
+    response, err := s.sendGoPlsRequest(lsp.MethodTextDocumentCompletion, lsp.CompletionParams{
+        TextDocumentPositionParams: lsp.TextDocumentPositionParams{
+            TextDocument: lsp.TextDocumentIdentifier{
+                URI: uri.File(pathConfig.GoPath(params.TextDocument.URI.Filename())),
+            },
+            Position: params.Position,
+        },
+        PartialResultParams: params.PartialResultParams,
+    })
+    if err != nil {
+        return &list, nil
+    }
+
+    var goplsCompletions *lsp.CompletionList
+    err = json.Unmarshal(response.Result(), goplsCompletions)
+    if err != nil {
+        return &list, nil
+    }
+
+    list.Items = append(list.Items, goplsCompletions.Items...)
+
 	return &list, nil
 }
 
@@ -439,13 +599,12 @@ func (s *GwirlLspServer) Declaration(ctx context.Context, params *lsp.Declaratio
 }
 
 func (s *GwirlLspServer) Definition(ctx context.Context, params *lsp.DefinitionParams) (result []lsp.Location, err error) {
-	s.logf("Definition params=%v", params)
 	contents := s.fileContents[params.TextDocument.URI]
 	if contents == "" {
 		return []lsp.Location{}, nil
 	}
 	var definition string
-	res := s.parser.Parse(contents, params.TextDocument.URI.Filename())
+	res := s.parser.Parse(contents, params.TextDocument.URI.Filename(), params.TextDocument.URI.Filename())
 	tt := FindTemplateTreeForPosition(res.Template.Content, LspPosToParserPos(params.Position))
 	if tt == nil {
 		s.log("Didn't find a match")
@@ -505,13 +664,12 @@ func (s *GwirlLspServer) Definition(ctx context.Context, params *lsp.DefinitionP
 }
 
 func (s *GwirlLspServer) DidChange(ctx context.Context, params *lsp.DidChangeTextDocumentParams) (err error) {
-	s.logf("DidChange params=%v", params)
 	s.openedFiles = append(s.openedFiles, params.TextDocument.URI.Filename())
 	if len(params.ContentChanges) > 0 {
 		s.fileContents[params.TextDocument.URI] = params.ContentChanges[0].Text
 	}
 
-	res := s.parser.Parse(s.fileContents[params.TextDocument.URI], params.TextDocument.URI.Filename())
+	res := s.parser.Parse(s.fileContents[params.TextDocument.URI], params.TextDocument.URI.Filename(), params.TextDocument.URI.Filename())
 
 	diagnostics := createDiagnosticsFromErrors(res.Errors)
 
@@ -519,6 +677,33 @@ func (s *GwirlLspServer) DidChange(ctx context.Context, params *lsp.DidChangeTex
 		Diagnostics: diagnostics,
 		URI:         params.TextDocument.URI,
 	})
+
+    if len(res.Errors) > 0 {
+        return nil
+    }
+
+    g := gen.NewGenerator(false)
+    sb := strings.Builder{}
+    err = g.Generate(res.Template, "html", &sb)
+    if err != nil {
+        s.logf("Failed to generate new go file for %s", params.TextDocument.URI.Filename())
+        return nil
+    }
+    err = s.sendGoPlsNotification(lsp.MethodTextDocumentDidChange, lsp.DidChangeTextDocumentParams{
+        TextDocument: lsp.VersionedTextDocumentIdentifier{
+            Version: params.TextDocument.Version,
+            TextDocumentIdentifier: lsp.TextDocumentIdentifier{
+                URI: uri.File(pathConfig.GoPath(params.TextDocument.URI.Filename())),
+            },
+        },
+        ContentChanges: []lsp.TextDocumentContentChangeEvent{
+            { Text: sb.String(), Range: params.ContentChanges[0].Range, RangeLength: params.ContentChanges[0].RangeLength },
+        },
+    })
+    if err != nil {
+        s.logf("Failed to send notification to gopls")
+        return nil
+    }
 
 	return nil
 }
@@ -540,11 +725,10 @@ func (s *GwirlLspServer) DidClose(ctx context.Context, params *lsp.DidCloseTextD
 }
 
 func (s *GwirlLspServer) DidOpen(ctx context.Context, params *lsp.DidOpenTextDocumentParams) (err error) {
-	s.logf("DidOpen params=%v", params)
 	s.openedFiles = append(s.openedFiles, params.TextDocument.URI.Filename())
-	s.fileContents[params.TextDocument.URI] = params.TextDocument.Text
+	s.fileContents = params.TextDocument.Text
 
-	res := s.parser.Parse(params.TextDocument.Text, params.TextDocument.URI.Filename())
+	res := s.parser.Parse(params.TextDocument.Text, params.TextDocument.URI.Filename(), params.TextDocument.URI.Filename())
 
 	diagnostics := createDiagnosticsFromErrors(res.Errors)
 
@@ -552,6 +736,25 @@ func (s *GwirlLspServer) DidOpen(ctx context.Context, params *lsp.DidOpenTextDoc
 		Diagnostics: diagnostics,
 		URI:         params.TextDocument.URI,
 	})
+        
+    if len(res.Errors) > 0 {
+        return nil
+    }
+
+    g := gen.NewGenerator(false)
+    sb := strings.Builder{}
+    err = g.Generate(res.Template, "html", &sb)
+    if err != nil {
+        s.logf("Failed to generate new go file for %s", params.TextDocument.URI.Filename())
+        return nil
+    }
+    err = s.sendGoPlsNotification(lsp.MethodTextDocumentDidChange, lsp.DidOpenTextDocumentParams{
+        TextDocument: params.TextDocument,
+    })
+    if err != nil {
+        s.logf("Failed to send notification to gopls")
+        return nil
+    }
 	return nil
 }
 func (s *GwirlLspServer) DidSave(ctx context.Context, params *lsp.DidSaveTextDocumentParams) (err error) {
@@ -581,26 +784,39 @@ func (s *GwirlLspServer) FoldingRanges(ctx context.Context, params *lsp.FoldingR
 func (s *GwirlLspServer) Formatting(ctx context.Context, params *lsp.DocumentFormattingParams) (result []lsp.TextEdit, err error) {
 	return nil, nil
 }
+
 func (s *GwirlLspServer) Hover(ctx context.Context, params *lsp.HoverParams) (result *lsp.Hover, err error) {
-	contents := s.fileContents[params.TextDocument.URI]
-	if contents == "" {
-		return nil, nil
-	}
-	p := parser.NewParser2("")
-	res := p.Parse(contents, params.TextDocument.URI.Filename())
-	word := FindWordAtPosition(&res.Template, params.Position)
-	if word == "" {
-		s.log("Didn't find a word for hover")
-		return nil, nil
-	}
-	hover := &lsp.Hover{
-		Contents: lsp.MarkupContent{
-			Kind:  "markdown",
-			Value: word,
-		},
-	}
+    res, err := s.sendGoPlsRequest(lsp.MethodTextDocumentHover, lsp.HoverParams{
+        TextDocumentPositionParams: lsp.TextDocumentPositionParams{
+            TextDocument: lsp.TextDocumentIdentifier{
+                URI: uri.File(pathConfig.GoPath(params.TextDocument.URI.Filename())),
+            },
+            Position: params.Position,
+        },
+    })
+
+    if err != nil {
+        s.logf("%s error sending gopls request: %v", lsp.MethodTextDocumentHover, err)
+        return nil, nil
+    }
+
+    if res.Err() != nil {
+        s.logf("%s error in gopls response: %v", lsp.MethodTextDocumentHover, res.Err())
+        return nil, res.Err()
+    }
+
+    s.logf("Received gopls result: %s", res.Result())
+
+    var hover *lsp.Hover
+    err = json.Unmarshal(res.Result(), hover)
+    if err != nil {
+        s.logf("%s error unmarshalling gopls request: %v", lsp.MethodTextDocumentHover, err)
+        return nil, nil
+    }
+
 	return hover, nil
 }
+
 func (s *GwirlLspServer) Implementation(ctx context.Context, params *lsp.ImplementationParams) (result []lsp.Location, err error) {
 	return nil, nil
 }
@@ -668,13 +884,13 @@ func (s *GwirlLspServer) OutgoingCalls(ctx context.Context, params *lsp.CallHier
 	return nil, nil
 }
 func (s *GwirlLspServer) SemanticTokensFull(ctx context.Context, params *lsp.SemanticTokensParams) (result *lsp.SemanticTokens, err error) {
-	contents := s.fileContents[params.TextDocument.URI]
-	if contents == "" {
+	contents, ok := s.templateCache.Load(params.TextDocument.URI)
+	if ok {
 		return nil, nil
 	}
+    cached, ok := contents.(TemplateCacheItem)
 
-	res := s.parser.Parse(contents, params.TextDocument.URI.Filename())
-	tokens := CreateTemplateSemanticTokens(&res.Template)
+	tokens := CreateTemplateSemanticTokens(&cached.template)
 	return tokens, nil
 }
 func (s *GwirlLspServer) SemanticTokensFullDelta(ctx context.Context, params *lsp.SemanticTokensDeltaParams) (result interface{}, err error) {

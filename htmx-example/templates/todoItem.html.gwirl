@@ -7,7 +7,7 @@
     sb := strings.Builder{}
     if todo.Completed { sb.WriteString("completed") }
     if todo.Editing { sb.WriteString(" editing") }
-    itemClasses := strings.Trim(sb.String())
+    itemClasses := strings.Trim(sb.String(), " \n\t")
 }
 
 <li id="todo-@todo.Id" hx-target="#todo-@todo.Id" hx-swap="outerHTML" class="@itemClasses">

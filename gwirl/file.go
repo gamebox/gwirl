@@ -11,9 +11,10 @@ import (
 )
 
 type File struct {
-	name     string
-	filetype string
-	content  string
+	name             string
+	originalFilename string
+	filetype         string
+	content          string
 }
 
 type FSAccessor interface {
@@ -68,22 +69,24 @@ func templateFiles(templateDir string, filters []string) []File {
 	if err != nil {
 		return files
 	}
-	for _, dir := range entries {
-		if dir.IsDir() {
-			subEntries := templateFiles(filepath.Join(templateDir, dir.Name()), filters)
+	for _, entry := range entries {
+		if entry.IsDir() {
+			subEntries := templateFiles(filepath.Join(templateDir, entry.Name()), filters)
 			files = append(files, subEntries...)
-		} else if strings.HasSuffix(dir.Name(), ".gwirl") && matchesFilter(dir.Name(), filters) {
-			fileContent, err := os.ReadFile(filepath.Join(templateDir, dir.Name()))
+		} else if strings.HasSuffix(entry.Name(), ".gwirl") && matchesFilter(entry.Name(), filters) {
+            filename := filepath.Join(templateDir, entry.Name())
+			fileContent, err := os.ReadFile(filename)
 			if err != nil {
 				continue
 			}
-			filenameSegments := strings.Split(filepath.Base(dir.Name()), ".")
+			filenameSegments := strings.Split(filepath.Base(entry.Name()), ".")
 			fileType := filenameSegments[len(filenameSegments)-2]
 			if fileType != "html" && fileType != "xml" && fileType != "md" && fileType != "txt" {
 				fileType = "txt"
 			}
 			files = append(files, File{
-				name:     strings.Split(dir.Name(), ".")[0],
+				name:     strings.Split(entry.Name(), ".")[0],
+                originalFilename: filename,
 				content:  string(fileContent),
 				filetype: fileType,
 			})

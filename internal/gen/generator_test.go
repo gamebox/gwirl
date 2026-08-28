@@ -114,6 +114,7 @@ func TestGenerator(t *testing.T) {
 		res := t.Run(test.filename, func(t *testing.T) {
 			gen := NewGenerator(false)
 			writer := strings.Builder{}
+            test.template.Filename = test.filename
 			gen.Generate(test.template, "views", &writer)
 			if writer.String() != test.expected {
 				edits := myers.ComputeEdits(span.URI(test.filename), test.expected, writer.String())

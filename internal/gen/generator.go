@@ -19,16 +19,31 @@ type Generator struct {
 	indentLevel int
 	indentStyle string
 	writer      io.Writer
+    filename    string
 }
 
 func NewGenerator(useTabs bool) Generator {
-	g := Generator{}
+    g := Generator{ filename: "" }
 	if useTabs {
 		g.indentStyle = tabIndent
 	} else {
 		g.indentStyle = spaceIndent
 	}
 	return g
+}
+
+func (G *Generator) GenLineDirective(positional parser.Position, indent bool) {
+    // if indent {
+    //     G.write("/*line ")
+    // } else {
+    //     G.writeNoIndent("/*line ")
+    // }
+    // G.writeNoIndent(G.filename)
+    // G.writeNoIndent(":")
+    // G.writeNoIndent(fmt.Sprintf("%d", positional.Line()))
+    // G.writeNoIndent(":")
+    // G.writeNoIndent(fmt.Sprintf("%d", positional.Column()))
+    // G.writeNoIndent("*/ ")
 }
 
 func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
@@ -49,17 +64,17 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		G.writeNoIndent("/")
 		G.newlines()
 	case parser.TT2GoBlock:
-		cleanedText := strings.TrimLeft(tree.Text, "{")
-		cleanedText = strings.TrimLeft(cleanedText, "\n")
-		cleanedText = strings.TrimRight(cleanedText, "}")
-		cleanedText = strings.TrimLeft(cleanedText, "\n")
+        G.GenLineDirective(&tree, true)
+		cleanedText := strings.TrimLeft(tree.Text, "{\n")
+		cleanedText = strings.TrimRight(cleanedText, "}\n")
 		for _, line := range strings.Split(cleanedText, "\n") {
 			G.write(strings.TrimLeft(line, " \t"))
 			G.write("\n")
 		}
 		G.newlines()
 	case parser.TT2If:
-		G.write("if ")
+        G.GenLineDirective(&tree, true)
+		G.writeNoIndent("if ")
 		G.writeNoIndent(tree.Text)
 		G.writeNoIndent(" {\n")
 		G.indent()
@@ -83,6 +98,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		}
 		G.newlines()
 	case parser.TT2ElseIf:
+        G.GenLineDirective(&tree, false)
 		G.writeNoIndent(" else if ")
 		G.writeNoIndent(tree.Text)
 		G.writeNoIndent(" {\n")
@@ -95,6 +111,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		G.dedent()
 		G.write("}")
 	case parser.TT2Else:
+        G.GenLineDirective(&tree, false)
 		G.writeNoIndent(" else {\n")
 		G.indent()
 		if len(tree.Children) > 0 {
@@ -105,7 +122,8 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 		G.dedent()
 		G.write("}")
 	case parser.TT2For:
-		G.write("for ")
+        G.GenLineDirective(&tree, true)
+		G.writeNoIndent("for ")
 		G.writeNoIndent(tree.Text)
 		G.writeNoIndent(" {\n")
 		G.indent()
@@ -148,6 +166,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 				G.write("gwirl.WriteRawHTML(&sb_, ")
 			}
 			transclusionParamsStr := transclusionParams.String()
+            G.GenLineDirective(&tree, false)
 			if strings.HasSuffix(tree.Text, "()") {
 				text, _ := strings.CutSuffix(tree.Text, ")")
 				text = text + transclusionParamsStr + ")"
@@ -166,6 +185,7 @@ func (G *Generator) GenTemplateTree(tree parser.TemplateTree2) error {
 			} else {
 				G.write("gwirl.WriteRawHTML(&sb_, ")
 			}
+            G.GenLineDirective(&tree, false)
 			G.writeNoIndent(tree.Text)
 			G.writeNoIndent(")")
 		}
@@ -202,6 +222,7 @@ func (G *Generator) dedent() {
 
 func (G *Generator) Generate(template parser.Template2, pkg string, writer io.Writer) error {
 	G.writer = writer
+    G.filename = template.Filename
 
 	pkgLine := fmt.Sprintf("package %s\n\n", pkg)
 	G.write(pkgLine)
@@ -222,8 +243,9 @@ func (G *Generator) Generate(template parser.Template2, pkg string, writer io.Wr
 	// Write comment as doc comment
 
 	// Write Template boilerplate start
+    G.GenLineDirective(&template.Params, true)
 	funcStart := fmt.Sprintf("func %s%s string {\n", template.Name.Str, template.Params.Str)
-	G.write(funcStart)
+	G.writeNoIndent(funcStart)
 
 	G.indent()
 	G.write("sb_ := gwirl.TemplateBuilder{}")

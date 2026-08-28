@@ -572,6 +572,7 @@ func (p *Parser2) elseCall() *TemplateTree2 {
 		blk := p.expressionPart(true)
 		if blk != nil {
 			t := NewTT2Else(*blk)
+            p.position(&t, reset+1)
 			return &t
 		}
 		return nil
@@ -753,7 +754,7 @@ func (p *Parser2) maybeTemplateArgs() *PosString {
 	return nil
 }
 
-func (p *Parser2) Parse(source string, name string) ParseResult2 {
+func (p *Parser2) Parse(source string, name string, filename string) ParseResult2 {
 	p.input.reset(source)
 	p.errorStack = make([]ParseError, 0, 0)
 
@@ -777,6 +778,7 @@ func (p *Parser2) Parse(source string, name string) ParseResult2 {
 		topImports,
 		mixeds,
 	)
+    template.Filename = filename
 
 	if len(p.errorStack) > 0 {
 		p.logf("Errors found while parsing\n")

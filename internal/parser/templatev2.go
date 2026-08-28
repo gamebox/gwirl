@@ -13,6 +13,7 @@ type Template2 struct {
 	Content    []TemplateTree2
 	column     int
 	line       int
+    Filename   string
 }
 
 func NewTemplate2(
